@@ -1,0 +1,10 @@
+parameters:
+    ns.security.query: NS\SecurityBundle\Doctrine\SecuredQuery
+
+services:
+  ns.security.query:
+    class: %ns.security.query%
+    arguments: [ "@security.context" ]
+  ns.model_manager:
+      class: NS\SecurityBundle\Model\Manager
+      arguments: [ "@security.context", "@doctrine.orm.entity_manager", "@ns.security.query" ]
