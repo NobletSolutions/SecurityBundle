@@ -6,12 +6,17 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * NS\SecurityBundle\Entity
- *
- * @ORM\Table(name="acls")
- * @ORM\Entity
+ * @ORM\MappedSuperclass
  */
-class ACL
+class BaseACL
 {
+    /**
+     * @var $id
+     * @ORM\Column(name="id",type="integer")
+     * @ORM\Id
+     */
+    protected $id;
+    
     /**
      * @var integer $user_id
      * 
@@ -37,11 +42,18 @@ class ACL
     protected $type;
 
     /**
-     * @var NobletSolutions\NedcoBundle\Entity\User $user
-     * 
-     * @ORM\ManyToOne(targetEntity="NobletSolutions\NedcoBundle\Entity\User", inversedBy="acls")
+     *
+     * @var DateTime $valid_from
+     * @ORM\Column(name="valid_from",type="datetime",nullable=true)
      */
-    protected $user;
+    protected $valid_from;
+    
+    /**
+     *
+     * @var DateTime $valid_to
+     * @ORM\Column(name="valid_to",type="datetime",nullable=true)
+     */    
+    protected $valid_to;
     
     /**
      * Set user_id
@@ -123,25 +135,48 @@ class ACL
     }
 
     /**
-     * Set user
+     * Set valid_from
      *
-     * @param \NobletSolutions\NedcoBundle\Entity\User $user
+     * @param \timestamp $validFrom
      * @return ACL
      */
-    public function setUser(\NobletSolutions\NedcoBundle\Entity\User $user = null)
+    public function setValidFrom(\timestamp $validFrom)
     {
-        $this->user = $user;
+        $this->valid_from = $validFrom;
     
         return $this;
     }
 
     /**
-     * Get user
+     * Get valid_from
      *
-     * @return \NobletSolutions\NedcoBundle\Entity\User 
+     * @return \timestamp 
      */
-    public function getUser()
+    public function getValidFrom()
     {
-        return $this->user;
+        return $this->valid_from;
+    }
+
+    /**
+     * Set valid_to
+     *
+     * @param \timestamp $validTo
+     * @return ACL
+     */
+    public function setValidTo(\timestamp $validTo)
+    {
+        $this->valid_to = $validTo;
+    
+        return $this;
+    }
+
+    /**
+     * Get valid_to
+     *
+     * @return \timestamp 
+     */
+    public function getValidTo()
+    {
+        return $this->valid_to;
     }
 }
