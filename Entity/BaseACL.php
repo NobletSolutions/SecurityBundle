@@ -11,17 +11,17 @@ use Doctrine\ORM\Mapping as ORM;
 class BaseACL
 {
     /**
-     * @var $id
+     * @var integer $id
      * @ORM\Column(name="id",type="integer")
      * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     protected $id;
-    
+
     /**
      * @var integer $user_id
      * 
      * @ORM\Column(name="user_id",type="integer")
-     * @ORM\Id
      */
     protected $user_id;
     
@@ -29,7 +29,6 @@ class BaseACL
      * @var integer $object_id
      * 
      * @ORM\Column(name="object_id",type="integer")
-     * @ORM\Id
      */    
     protected $object_id;
     
@@ -37,7 +36,6 @@ class BaseACL
      * @var integer $type
      * 
      * @ORM\Column(name="type",type="integer")
-     * @ORM\Id
      */    
     protected $type;
 
@@ -54,6 +52,16 @@ class BaseACL
      * @ORM\Column(name="valid_to",type="datetime",nullable=true)
      */    
     protected $valid_to;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
     
     /**
      * Set user_id
@@ -76,16 +84,6 @@ class BaseACL
     public function getUserId()
     {
         return $this->user_id;
-    }
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 
     /**
@@ -140,7 +138,7 @@ class BaseACL
      * @param \timestamp $validFrom
      * @return ACL
      */
-    public function setValidFrom(\timestamp $validFrom)
+    public function setValidFrom($validFrom)
     {
         $this->valid_from = $validFrom;
     
@@ -163,7 +161,7 @@ class BaseACL
      * @param \timestamp $validTo
      * @return ACL
      */
-    public function setValidTo(\timestamp $validTo)
+    public function setValidTo($validTo)
     {
         $this->valid_to = $validTo;
     
