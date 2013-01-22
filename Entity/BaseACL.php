@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * NS\SecurityBundle\Entity
  * @ORM\MappedSuperclass
  */
-class BaseACL
+class BaseACL implements \Serializable
 {
     /**
      * @var integer $id
@@ -176,5 +176,35 @@ class BaseACL
     public function getValidTo()
     {
         return $this->valid_to;
+    }
+    
+    /**
+     * @see \Serializable::serialize()
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->user_id,
+            $this->object_id,
+            $this->type,
+            $this->valid_from,
+            $this->valid_to,
+        ));
+    }
+
+    /**
+     * @see \Serializable::unserialize()
+     */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->user_id,
+            $this->object_id,
+            $this->type,
+            $this->valid_from,
+            $this->valid_to
+            ) = unserialize($serialized);
     }
 }
