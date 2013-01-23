@@ -50,7 +50,7 @@ class SecuredQuery
         {
             foreach($condition->getRoles() as $val)
             {
-                if($this->securityContext->isGranted($val)) // 
+                if($this->securityContext->isGranted($val))
                 {
                     $role = $val;
                     $cond = $condition;
