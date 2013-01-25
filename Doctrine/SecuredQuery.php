@@ -41,72 +41,70 @@ class SecuredQuery
         if(!$securedObject)
             return;
 
-        $aliases   = array();
-        $aliases[] = $alias;
+        $aliases       = array();
+        $aliases[]     = $alias;
+        $role          = false;
+        $cond          = null;
 
-        $checked_roles = array();
         foreach($securedObject->getConditions() as $condition)
         {
-            $role = false;
-
             foreach($condition->getRoles() as $val)
             {
-                if($this->securityContext->isGranted($val)) // 
+                if($this->securityContext->isGranted($val))
                 {
                     $role = $val;
+                    $cond = $condition;
                     break;
                 }
-                else
-                    $checked_roles[] = $val;
             }
 
-            if($role !== false) // have a role
+            if($role != false)
+                break;
+        }
+        
+        if($role !== false) // have a role
+        {
+            $ids = $this->user->getACLObjectIdsForRole($role);
+
+            if(count($ids) == 0)
+                throw new \Exception('This user has no configured acls for this role');
+
+            if($cond->hasThrough())
             {
-                $ids = $this->user->getACLObjectIdsForRole($role);
-                
-                if(count($ids) == 0)
-                    throw new \Exception('This user has no configured acls for this role');
-                
-                if($condition->hasThrough())
+                foreach($cond->getThrough() as $association)
                 {
-                    foreach($condition->getThrough() as $association)
+                    $joins = $this->queryBuilder->getDQLPart('join');
+                    $found = false;
+
+                    foreach($joins[$alias] as $join)
                     {
-                        $joins = $this->queryBuilder->getDQLPart('join');
-                        $found = false;
-                        
-                        foreach($joins[$alias] as $join)
+                        if($join->getJoin() == "$alias.$association")
                         {
-                            if($join->getJoin() == "$alias.$association")
-                            {
-                                $found = true;
-                                $aliases[] = $join->getAlias();
-                            }
-                        }
-                        if(!$found)
-                        {
-                            $newalias = strtolower(substr($association,0,3)).self::$_alias_count++;
-                            $this->queryBuilder->leftJoin(end($aliases).'.'.$association, $newalias);
-                            $aliases[] = $newalias;
+                            $found = true;
+                            $aliases[] = $join->getAlias();
                         }
                     }
-                }
-
-                if(count($ids) > 1)
-                {
-                    $this->queryBuilder->add(
-                                            'where', 
-                                            $this->queryBuilder->expr()->in(end($aliases).'.'.$condition->getField(),$ids) , 
-                                            true);
-                }
-                else if(count($ids) == 1)
-                {
-                    $key = end($aliases).$condition->getField().rand(0,50);
-                    $this->queryBuilder
-                         ->andWhere('('.end($aliases).'.'.$condition->getField()." = :$key )")
-                        ->setParameter($key,current($ids) );
+                    if(!$found)
+                    {
+                        $newalias = strtolower(substr($association,0,3)).self::$_alias_count++;
+                        $this->queryBuilder->leftJoin(end($aliases).'.'.$association, $newalias);
+                        $aliases[] = $newalias;
+                    }
                 }
             }
+
+            if(count($ids) > 1)
+                $this->queryBuilder->andWhere($this->queryBuilder->expr()->in(end($aliases).'.'.$condition->getField(),$ids));
+            else if(count($ids) == 1)
+            {
+                $key = end($aliases).$condition->getField().rand(0,50);
+                $this->queryBuilder
+                     ->andWhere('('.end($aliases).'.'.$condition->getField()." = :$key )")
+                    ->setParameter($key,current($ids) );
+            }
         }
+        else
+            throw new \Exception("This user has no roles");
 
         return $this->queryBuilder;
     }
