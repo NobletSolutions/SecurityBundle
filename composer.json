@@ -1,0 +1,25 @@
+{
+    "name": "ns/security-bundle",
+    "type": "symfony-bundle",
+    "description": "This Bundle provides a basic database row level ACL system",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Nathanael David Noblet",
+            "email": "nathanael@noblet.ca"
+        },
+    ],
+
+    "require": {
+        "php":                                ">=5.3.2",
+	"symfony/symfony":                    "2.1.*",
+        "symfony/assetic-bundle":             "2.1.*"
+
+    },
+
+    "autoload": {
+        "psr-0": { "NS\\SecurityBundle": "" }
+    },
+    "target-dir": "NS/SecurityBundle"
+}
+
