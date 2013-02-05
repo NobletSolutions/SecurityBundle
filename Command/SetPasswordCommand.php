@@ -21,6 +21,16 @@ class SetPasswordCommand extends ContainerAwareCommand
                            'User email address'
                    ),
                    new InputArgument(
+                           'class',
+                           InputArgument::REQUIRED,
+                           'User class'
+                   ),
+                   new InputArgument(
+                           'user_field',
+                           InputArgument::REQUIRED,
+                           'User field'
+                   ),
+                   new InputArgument(
                            'newpass',
                            InputArgument::REQUIRED,
                            'New Password'
@@ -30,24 +40,31 @@ class SetPasswordCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $u_email     = $input->getArgument('user_email');
-        $newpass     = $input->getArgument('newpass');
-        $em          = $this->getContainer()->get('doctrine')->getEntityManager();
+        $u_email = $input->getArgument('user_email');
+        $newpass = $input->getArgument('newpass');
+        $class   = $input->getArgument('class');
+        $ufield  = $input->getArgument('user_field');
+        $em      = $this->getContainer()->get('doctrine')->getEntityManager();
 
         try
-            {
-            $user    = $em->createQueryBuilder()->select('u')->from('NobletSolutions\NedcoBundle\Entity\User','u')->where('u.login = :email')->setParameter('email',$u_email)->getQuery()->getResult();
-            $user    = $user[0];
+        {
+            $user    = $em->createQueryBuilder()->select('u')->from($class,'u')->where('u.'.$ufield.' = :email')->setParameter('email',$u_email)->getQuery()->getSingleResult();
             $factory = $this->getContainer()->get('security.encoder_factory');
             $encoder = $factory->getEncoder($user);
 
-            $output->writeln("User: ".$user->getName());
-            $user->resetSalt();
+            $output->writeln("User: $user");
+            if(method_exists($user, 'resetSalt'))
+                $user->resetSalt();
+            
             $user->setPassword($encoder->encodePassword($newpass,$user->getSalt()));
             $em->persist($user);
             $em->flush();
 
             $output->writeln("Password updated");
+        }
+        catch (\Doctrine\ORM\NoResultException $e)
+        {
+            $output->writeln("No such user ".$e->getMessage());
         }
         catch (\Exception $e)
         {
