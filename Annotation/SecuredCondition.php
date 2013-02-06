@@ -14,7 +14,6 @@ class SecuredCondition
     private $roles;
     private $through;
     private $field;
-    private $apply_to;
     
     public function __construct($options)
     {
@@ -29,11 +28,6 @@ class SecuredCondition
             $this->field = $options['field'];
         else
             throw new \Exception("Missing required property 'field'");
-        
-//        if(isset($options['apply_to']))
-//            $this->apply_to = $options['apply_to'];
-//        else
-//            throw new \Exception("Missing required property 'apply_to'");
     }
  
     public function hasThrough()
@@ -49,11 +43,6 @@ class SecuredCondition
     public function getField()
     {
         return $this->field;
-    }
-    
-    public function getApplyTo()
-    {
-        return $this->apply_to;
     }
     
     public function getRoles()
