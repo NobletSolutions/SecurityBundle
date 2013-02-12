@@ -39,12 +39,12 @@ class SecuredQuery
         $securedObject      = $r->getClassAnnotation(new \ReflectionClass($class),'NS\SecurityBundle\Annotation\Secured');
         
         if(!$securedObject)
-            return;
+             return null;
 
-        $aliases       = array();
-        $aliases[]     = $alias;
-        $role          = false;
-        $cond          = null;
+        $aliases   = array();
+        $aliases[] = $alias;
+        $role      = false;
+        $cond      = null;
 
         foreach($securedObject->getConditions() as $condition)
         {
@@ -61,7 +61,7 @@ class SecuredQuery
             if($role != false)
                 break;
         }
-        
+
         if($role !== false) // have a role
         {
             $ids = $this->user->getACLObjectIdsForRole($role);
@@ -76,14 +76,18 @@ class SecuredQuery
                     $joins = $this->queryBuilder->getDQLPart('join');
                     $found = false;
 
-                    foreach($joins[$alias] as $join)
+                    if(isset($joins[$alias]))
                     {
-                        if($join->getJoin() == "$alias.$association")
+                        foreach($joins[$alias] as $join)
                         {
-                            $found = true;
-                            $aliases[] = $join->getAlias();
+                            if($join->getJoin() == "$alias.$association")
+                            {
+                                $found = true;
+                                $aliases[] = $join->getAlias();
+                            }
                         }
                     }
+
                     if(!$found)
                     {
                         $newalias = strtolower(substr($association,0,3)).self::$_alias_count++;
