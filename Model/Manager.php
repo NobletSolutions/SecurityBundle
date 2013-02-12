@@ -4,7 +4,6 @@ namespace NS\SecurityBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\SecurityContext;
-use \Symfony\Component\DependencyInjection\Container;
 use \NS\SecurityBundle\Doctrine\SecuredQuery;
 use \NS\SecurityBundle\Model\SecuredRepositoryInterface;
 
@@ -43,5 +42,15 @@ class Manager
         }
         
         return $repo;
+    }
+    
+    public function persist($object)
+    {
+        $this->_em->persist($object);
+    }
+    
+    public function flush()
+    {
+        $this->_em->flush();
     }
 }
