@@ -6,6 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+
 use \NobletSolutions\NedcoBundle\Entity\User;
 
 class SetPasswordCommand extends ContainerAwareCommand
@@ -52,7 +54,11 @@ class SetPasswordCommand extends ContainerAwareCommand
             $factory = $this->getContainer()->get('security.encoder_factory');
             $encoder = $factory->getEncoder($user);
 
-            $output->writeln("User: $user");
+	    if($user instanceof UserInterface)
+                $output->writeln("User: ".$user->getUsername());
+            else if(method_exists($user,'__toString'))
+                $output->writeln("User: $user");
+
             if(method_exists($user, 'resetSalt'))
                 $user->resetSalt();
             
