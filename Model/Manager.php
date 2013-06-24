@@ -46,11 +46,16 @@ class Manager
     
     public function persist($object)
     {
-        $this->_em->persist($object);
+        return $this->_em->persist($object);
     }
     
     public function flush()
     {
-        $this->_em->flush();
+        return $this->_em->flush();
+    }
+
+    public function remove($object)
+    {
+        return $this->_em->remove($object);
     }
 }
