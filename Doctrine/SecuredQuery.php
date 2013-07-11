@@ -37,9 +37,10 @@ class SecuredQuery
         
         $r                  = new AnnotationReader(); 
         $securedObject      = $r->getClassAnnotation(new \ReflectionClass($class),'NS\SecurityBundle\Annotation\Secured');
-        
+
+        // this object isn't secured
         if(!$securedObject)
-             return null;
+             return $query;
 
         $aliases   = array();
         $aliases[] = $alias;
@@ -64,6 +65,9 @@ class SecuredQuery
 
         if($role !== false) // have a role
         {
+            if(!$cond->isEnabled())
+                return $query;
+
             $ids = $this->user->getACLObjectIdsForRole($role);
 
             if(count($ids) == 0)
@@ -104,7 +108,7 @@ class SecuredQuery
                 $key = end($aliases).$condition->getField().rand(0,50);
                 $this->queryBuilder
                      ->andWhere('('.end($aliases).'.'.$condition->getField()." = :$key )")
-                    ->setParameter($key,current($ids) );
+                     ->setParameter($key,current($ids));
             }
         }
         else

@@ -14,19 +14,23 @@ class SecuredCondition
     private $roles;
     private $through;
     private $field;
+    private $enabled = true;
     
     public function __construct($options)
     {
         $this->through = (isset($options['through'])) ? $options['through']:null;
 
         if(isset($options['roles']))
-            $this->roles = (is_array($options['roles']))?$options['roles']:array($options['roles']);
+            $this->roles = (is_array($options['roles'])) ? $options['roles'] : array($options['roles']);
         else
             throw new \Exception("Missing required property 'roles'");
-        
+
+        if(isset($options['enabled']))
+            $this->enabled = (bool)$options['enabled'];
+
         if(isset($options['field']))
             $this->field = $options['field'];
-        else
+        else if($this->enabled === true)
             throw new \Exception("Missing required property 'field'");
     }
  
@@ -53,5 +57,10 @@ class SecuredCondition
     public function appliesToRole($role)
     {
         return in_array($role, $this->roles);
+    }
+
+    public function isEnabled()
+    {
+        return $this->enabled;
     }
 }
