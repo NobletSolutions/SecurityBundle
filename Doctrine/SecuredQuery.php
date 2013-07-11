@@ -71,7 +71,7 @@ class SecuredQuery
             $ids = $this->user->getACLObjectIdsForRole($role);
 
             if(count($ids) == 0)
-                throw new \Exception('This user has no configured acls for this role');
+                throw new \Exception('This user has no configured acls for role '.$role);
 
             if($cond->hasThrough())
             {
