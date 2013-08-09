@@ -39,6 +39,7 @@ class Manager
         {
             $repo->setSecurityContext($this->_securityContext);
             $repo->setSecuredQuery($this->_securedQuery);
+            $repo->setManager($this);
         }
         
         return $repo;

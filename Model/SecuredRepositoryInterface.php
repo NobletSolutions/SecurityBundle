@@ -10,4 +10,5 @@ interface SecuredRepositoryInterface
 {
     public function setSecurityContext($security);
     public function setSecuredQuery($qb);
+    public function setManager($manager);
 }
