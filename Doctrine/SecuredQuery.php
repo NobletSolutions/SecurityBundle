@@ -23,9 +23,12 @@ class SecuredQuery
     public function __construct(SecurityContext $securityContext)
     {
         $this->securityContext = $securityContext;
+        if(!$this->securityContext->getToken())
+            throw new \Exception("There is no token");
+
         $this->user = $this->securityContext->getToken()->getUser();
         if(!($this->user instanceof SecuredEntityInterface))
-            throw new \Exception("The User doesn't implement SecuredEntityInterface");
+            throw new \Exception("The user doesn't implement SecuredEntityInterface");
     }
     
     public function secure(QueryBuilder $query)
