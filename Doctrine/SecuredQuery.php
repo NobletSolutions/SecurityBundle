@@ -24,7 +24,7 @@ class SecuredQuery
     {
         $this->securityContext = $securityContext;
         if(!$this->securityContext->getToken())
-            throw new \Exception("There is no token");
+            return;
 
         $this->user = $this->securityContext->getToken()->getUser();
         if(!($this->user instanceof SecuredEntityInterface))
@@ -33,6 +33,9 @@ class SecuredQuery
     
     public function secure(QueryBuilder $query)
     {
+        if(!$this->user)
+            return $query;
+
         $this->queryBuilder = $query;
         $from               = $this->queryBuilder->getDQLPart('from');
         $alias              = $from[0]->getAlias();
