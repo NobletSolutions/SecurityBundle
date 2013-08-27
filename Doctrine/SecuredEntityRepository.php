@@ -50,7 +50,7 @@ class SecuredEntityRepository extends EntityRepository implements SecuredReposit
     {
         $this->_manager = $manager;
 
-        return this;
+        return $this;
     }
 
     public function getManager()
