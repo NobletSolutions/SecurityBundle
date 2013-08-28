@@ -6,6 +6,8 @@ use Symfony\Component\Security\Core\SecurityContext;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Annotations\AnnotationReader;
 use NS\SecurityBundle\Model\SecuredEntityInterface;
+use NS\SecurityBundle\Annotation\SecuredCondition;
+use NS\SecurityBundle\Annotation\SecuredPath;
 
 /**
  * Description of SecuredQuery
@@ -38,9 +40,7 @@ class SecuredQuery
 
         $this->queryBuilder = $query;
         $from               = $this->queryBuilder->getDQLPart('from');
-        $alias              = $from[0]->getAlias();
         $class              = $from[0]->getFrom();
-        
         $r                  = new AnnotationReader(); 
         $securedObject      = $r->getClassAnnotation(new \ReflectionClass($class),'NS\SecurityBundle\Annotation\Secured');
 
@@ -48,6 +48,7 @@ class SecuredQuery
         if(!$securedObject)
              return $query;
 
+        $alias     = $from[0]->getAlias();
         $aliases   = array();
         $aliases[] = $alias;
         $role      = false;

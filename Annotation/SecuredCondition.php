@@ -5,7 +5,7 @@ namespace NS\SecurityBundle\Annotation;
 use Doctrine\Common\Annotations\Reader;
 
 /**
- * Description of Secured
+ * Description of SecuredCondition
  * @Annotation
  * @author gnat
  */
