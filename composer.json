@@ -2,7 +2,7 @@
     "name": "ns/security-bundle",
     "type": "symfony-bundle",
     "description": "This Bundle provides a basic database row level ACL system",
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Nathanael David Noblet",
