@@ -62,7 +62,11 @@ class BaseACL implements \Serializable
     {
         $this->id = $id;
     }
-    
+
+    public function __toString()
+    {
+        return var_export($this, true);
+    }
     /**
      * Set user_id
      *

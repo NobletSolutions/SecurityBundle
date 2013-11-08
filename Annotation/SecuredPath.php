@@ -5,25 +5,23 @@ namespace NS\SecurityBundle\Annotation;
 use Doctrine\Common\Annotations\Reader;
 
 /**
- * Description of SecuredCondition
+ * Description of SecuredPath
  * @Annotation
  * @author gnat
  */
-class SecuredCondition
+class SecuredPath
 {
-    private $roles;
+    private $paths;
     private $through;
     private $field;
     private $enabled = true;
-    
+
     public function __construct($options)
     {
-        $this->through = (isset($options['through'])) ? $options['through']:null;
-
-        if(isset($options['roles']))
-            $this->roles = (is_array($options['roles'])) ? $options['roles'] : array($options['roles']);
+        if(isset($options['paths']))
+            $this->paths = (is_array($options['paths'])) ? $options['paths'] : array($options['paths']);
         else
-            throw new \Exception("Missing required property 'roles'");
+            throw new \Exception("Missing required property 'paths'");
 
         if(isset($options['enabled']))
             $this->enabled = (bool)$options['enabled'];
@@ -32,31 +30,33 @@ class SecuredCondition
             $this->field = $options['field'];
         else if($this->enabled === true)
             throw new \Exception("Missing required property 'field'");
+
+        $this->through = (isset($options['through'])) ? $options['through']:null;
     }
- 
+
     public function hasThrough()
     {
         return !empty($this->through);
     }
-    
+
     public function getThrough()
     {
         return $this->through;
     }
-    
+
     public function getField()
     {
         return $this->field;
     }
-    
-    public function getRoles()
+
+    public function getPaths()
     {
-        return $this->roles;
+        return $this->paths;
     }
-    
-    public function appliesToRole($role)
+
+    public function appliesToPath($path)
     {
-        return in_array($role, $this->roles);
+        return in_array($path, $this->paths);
     }
 
     public function isEnabled()

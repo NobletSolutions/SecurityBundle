@@ -15,29 +15,46 @@ class SecuredEntityRepository extends EntityRepository implements SecuredReposit
 {
     private $_security;
     private $_queryBuilder;
+    private $_manager;
     
     public function setSecurityContext($security)
     {
         $this->_security = $security;
+
+        return $this;
+    }
+
+    public function getSecurityContext()
+    {
+        return $this->_security;
     }
 
     public function setSecuredQuery($qb)
     {
         $this->_queryBuilder = $qb;
+
+        return $this;
     }
-    
+
     public function getSecuredQuery()
     {
         return $this->_queryBuilder;
     }
-    
-    public function getSecurityContext()
-    {
-        return $this->_security;
-    }
-    
+
     public function secure(QueryBuilder $qb)
     {
         return $this->_queryBuilder->secure($qb);
+    }
+
+    public function setManager($manager)
+    {
+        $this->_manager = $manager;
+
+        return $this;
+    }
+
+    public function getManager()
+    {
+        return $this->_manager;
     }
 }

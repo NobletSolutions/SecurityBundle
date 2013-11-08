@@ -6,6 +6,8 @@ use Symfony\Component\Security\Core\SecurityContext;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Annotations\AnnotationReader;
 use NS\SecurityBundle\Model\SecuredEntityInterface;
+use NS\SecurityBundle\Annotation\SecuredCondition;
+use NS\SecurityBundle\Annotation\SecuredPath;
 
 /**
  * Description of SecuredQuery
@@ -23,24 +25,30 @@ class SecuredQuery
     public function __construct(SecurityContext $securityContext)
     {
         $this->securityContext = $securityContext;
+        if(!$this->securityContext->getToken())
+            return;
+
         $this->user = $this->securityContext->getToken()->getUser();
         if(!($this->user instanceof SecuredEntityInterface))
-            throw new \Exception("The User doesn't implement SecuredEntityInterface");
+            throw new \Exception("The user doesn't implement SecuredEntityInterface");
     }
     
     public function secure(QueryBuilder $query)
     {
+        if(!$this->user)
+            return $query;
+
         $this->queryBuilder = $query;
         $from               = $this->queryBuilder->getDQLPart('from');
-        $alias              = $from[0]->getAlias();
         $class              = $from[0]->getFrom();
-        
         $r                  = new AnnotationReader(); 
         $securedObject      = $r->getClassAnnotation(new \ReflectionClass($class),'NS\SecurityBundle\Annotation\Secured');
-        
-        if(!$securedObject)
-             return null;
 
+        // this object isn't secured
+        if(!$securedObject)
+             return $query;
+
+        $alias     = $from[0]->getAlias();
         $aliases   = array();
         $aliases[] = $alias;
         $role      = false;
@@ -64,10 +72,13 @@ class SecuredQuery
 
         if($role !== false) // have a role
         {
+            if(!$cond->isEnabled())
+                return $query;
+
             $ids = $this->user->getACLObjectIdsForRole($role);
 
             if(count($ids) == 0)
-                throw new \Exception('This user has no configured acls for this role');
+                throw new \Exception('This user has no configured acls for role '.$role);
 
             if($cond->hasThrough())
             {
@@ -104,7 +115,7 @@ class SecuredQuery
                 $key = end($aliases).$condition->getField().rand(0,50);
                 $this->queryBuilder
                      ->andWhere('('.end($aliases).'.'.$condition->getField()." = :$key )")
-                    ->setParameter($key,current($ids) );
+                     ->setParameter($key,current($ids));
             }
         }
         else
