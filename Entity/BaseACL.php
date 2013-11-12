@@ -16,21 +16,21 @@ class BaseACL implements \Serializable
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    protected $id;
+    private $id;
 
     /**
      * @var integer $user_id
      * 
      * @ORM\Column(name="user_id",type="integer")
      */
-    protected $user_id;
+    private $user_id;
     
     /**
      * @var integer $object_id
      * 
      * @ORM\Column(name="object_id",type="integer")
      */    
-    protected $object_id;
+    private $object_id;
     
     /**
      * @var integer $type
@@ -44,23 +44,18 @@ class BaseACL implements \Serializable
      * @var DateTime $valid_from
      * @ORM\Column(name="valid_from",type="datetime",nullable=true)
      */
-    protected $valid_from;
+    private $valid_from;
     
     /**
      *
      * @var DateTime $valid_to
      * @ORM\Column(name="valid_to",type="datetime",nullable=true)
      */    
-    protected $valid_to;
+    private $valid_to;
 
     public function getId()
     {
         return $this->id;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
     public function __toString()
