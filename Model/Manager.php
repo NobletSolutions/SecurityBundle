@@ -2,18 +2,18 @@
 
 namespace NS\SecurityBundle\Model;
 
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\SecurityContext;
 use \NS\SecurityBundle\Doctrine\SecuredQuery;
 use \NS\SecurityBundle\Model\SecuredRepositoryInterface;
+use \Doctrine\Common\Persistence\ObjectManager;
 
-class Manager 
+class Manager implements ObjectManager
 {
     private $_em;
     private $_securityContext;
     private $_securedQuery;
     
-    public function __construct(SecurityContext $securityContext, EntityManager $em, SecuredQuery $sqb)
+    public function __construct(SecurityContext $securityContext, ObjectManager $em, SecuredQuery $sqb)
     {
         $this->_em              = $em;
         $this->_securityContext = $securityContext;
@@ -58,5 +58,41 @@ class Manager
     public function remove($object)
     {
         return $this->_em->remove($object);
+    }
+
+    public function clear($objectName = null) {
+        return $this->_em->clear($objectName);
+    }
+
+    public function contains($object) {
+        return $this->_em->contains($object);
+    }
+
+    public function detach($object) {
+        return $this->_em->detach($object);
+    }
+
+    public function find($className, $id) {
+        return $this->_em->find($className, $id);
+    }
+
+    public function getClassMetadata($className) {
+        return $this->_em->getClassMetadata($className);
+    }
+
+    public function getMetadataFactory() {
+        return $this->_em->getMetadataFactory();
+    }
+
+    public function initializeObject($obj) {
+        return $this->_em->initializeObject($obj);
+    }
+
+    public function merge($object) {
+        return $this->_em->merge($object);
+    }
+
+    public function refresh($object) {
+        return $this->_em->refresh($object);
     }
 }
