@@ -8,3 +8,12 @@ services:
   ns.model_manager:
       class: NS\SecurityBundle\Model\Manager
       arguments: [ "@security.context", "@doctrine.orm.entity_manager", "@ns.security.query" ]
+  ns.security.authentication.listener:
+    class: NS\SecurityBundle\Auth\AdminListener
+    parent: security.authentication.listener.abstract
+    abstract: true
+  security.authentication_provider.ns_security:
+    class: NS\SecurityBundle\Auth\AdminAuthenticationProvider
+    abstract: true
+    public: false
+    arguments: [ '', "@security.user_checker", '', "@security.encoder_factory", "%security.authentication.hide_user_not_found%" ]
