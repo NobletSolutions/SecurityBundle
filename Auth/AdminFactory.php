@@ -27,11 +27,11 @@ class AdminFactory extends FormLoginFactory
  
     protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
     {
-        $provider = 'security.authentication_provider.ns_security'.$id;
+        $provider = 'security.authentication_provider.ns_security_'.$id;
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication_provider.ns_security'))
             ->replaceArgument(0, new Reference($userProviderId))
-            ->replaceArgument(2, $provider);
+            ->replaceArgument(2, $id);
         
         return $provider;
     }
