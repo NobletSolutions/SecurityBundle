@@ -108,15 +108,31 @@ class SecuredQuery
                 }
             }
 
-            if(count($ids) > 1)
-                $this->queryBuilder->andWhere($this->queryBuilder->expr()->in(end($aliases).'.'.$condition->getField(),$ids));
-            else if(count($ids) == 1)
+            if($cond->hasField())
             {
-                $key = end($aliases).$condition->getField().rand(0,50);
-                $this->queryBuilder
-                     ->andWhere('('.end($aliases).'.'.$condition->getField()." = :$key )")
-                     ->setParameter($key,current($ids));
+                if(count($ids) > 1)
+                    $this->queryBuilder->andWhere($this->queryBuilder->expr()->in(end($aliases).'.'.$condition->getField(),$ids));
+                else if(count($ids) == 1)
+                {
+                    $key = end($aliases).$condition->getField().rand(0,50);
+                    $this->queryBuilder
+                         ->andWhere('('.end($aliases).'.'.$condition->getField()." = :$key )")
+                         ->setParameter($key,current($ids));
+                }
             }
+            else if($cond->hasRelation())
+            {
+                if(count($ids) == 1)
+                {
+                    $ref = $this->queryBuilder->getEntityManager()->getReference($cond->getClass(),current($ids));
+                    $key = end($aliases).$condition->getRelation().rand(0,50);
+                    $this->queryBuilder
+                         ->andWhere('('.end($aliases).'.'.$condition->getRelation()." = :$key )")
+                         ->setParameter($key,$ref);
+                }
+            }
+            else
+                throw new \InvalidArgumentException("The condition has neither fields nor classes - this should never be thrown");
         }
         else
             throw new \Exception("This user has no roles");

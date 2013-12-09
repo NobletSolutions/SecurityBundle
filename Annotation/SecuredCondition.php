@@ -13,8 +13,10 @@ class SecuredCondition
 {
     private $roles;
     private $through;
-    private $field;
-    private $enabled = true;
+    private $field    = null;
+    private $enabled  = true;
+    private $class    = null;
+    private $relation = null;
     
     public function __construct($options)
     {
@@ -28,10 +30,16 @@ class SecuredCondition
         if(isset($options['enabled']))
             $this->enabled = (bool)$options['enabled'];
 
+        if($this->enabled === true && !isset($options['field']) && (!isset($options['relation']) || !isset($options['class'])))
+            throw new \Exception("Missing required property 'field' or 'relation' and 'class'");
+
         if(isset($options['field']))
             $this->field = $options['field'];
-        else if($this->enabled === true)
-            throw new \Exception("Missing required property 'field'");
+        else
+        {
+            $this->class = $options['class'];
+            $this->relation = $options['relation'];
+        }
     }
  
     public function hasThrough()
@@ -62,5 +70,48 @@ class SecuredCondition
     public function isEnabled()
     {
         return $this->enabled;
+    }
+
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
+        return $this;
+    }
+
+    public function getEnabled()
+    {
+        return $this->enabled;
+    }
+
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    public function setClass($class)
+    {
+        $this->class = $class;
+        return $this;
+    }
+
+    public function getRelation()
+    {
+        return $this->relation;
+    }
+
+    public function setRelation($relation)
+    {
+        $this->relation = $relation;
+        return $this;
+    }
+
+    public function hasField()
+    {
+        return !is_null($this->field);
+    }
+
+    public function hasRelation()
+    {
+        return !is_null($this->relation);
     }
 }
