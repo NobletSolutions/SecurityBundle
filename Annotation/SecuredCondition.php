@@ -20,18 +20,24 @@ class SecuredCondition
     
     public function __construct($options)
     {
-        $this->through = (isset($options['through'])) ? $options['through']:null;
+        if(isset($options['through']))
+        {
+            if(!is_array($options['through']))
+                $options['through'] = array($options['through']);
+
+            $this->through = $options['through'];
+        }
 
         if(isset($options['roles']))
             $this->roles = (is_array($options['roles'])) ? $options['roles'] : array($options['roles']);
         else
-            throw new \Exception("Missing required property 'roles'");
+            throw new \RuntimeException("Missing required property 'roles'");
 
         if(isset($options['enabled']))
             $this->enabled = (bool)$options['enabled'];
 
         if($this->enabled === true && !isset($options['field']) && (!isset($options['relation']) || !isset($options['class'])))
-            throw new \Exception("Missing required property 'field' or 'relation' and 'class'");
+            throw new \RuntimeException("Missing required property 'field' or 'relation' and 'class'");
 
         if(isset($options['field']))
             $this->field = $options['field'];
