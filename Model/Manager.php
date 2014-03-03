@@ -95,4 +95,14 @@ class Manager implements ObjectManager
     public function refresh($object) {
         return $this->_em->refresh($object);
     }
+
+    public function getUnitOfWork() {
+        return $this->_em->getUnitOfWork();
+    }
+
+    public function __call($name, $arguments)
+    {
+        if(method_exists($this->_em, $name))
+            return call_user_func_array (array($this->_em,$name), $arguments);
+    }
 }
