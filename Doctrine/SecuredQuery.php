@@ -30,7 +30,7 @@ class SecuredQuery
 
         $this->user = $this->securityContext->getToken()->getUser();
         if(!($this->user instanceof SecuredEntityInterface))
-            throw new \Exception("The user doesn't implement SecuredEntityInterface");
+            throw new \RuntimeException("The user doesn't implement SecuredEntityInterface");
     }
     
     public function secure(QueryBuilder $query)
@@ -49,8 +49,7 @@ class SecuredQuery
              return $query;
 
         $alias     = $from[0]->getAlias();
-        $aliases   = array();
-        $aliases[] = $alias;
+        $aliases   = array($alias);
         $role      = false;
         $cond      = null;
 
@@ -62,12 +61,9 @@ class SecuredQuery
                 {
                     $role = $val;
                     $cond = $condition;
-                    break;
+                    break 2;
                 }
             }
-
-            if($role != false)
-                break;
         }
 
         if($role !== false) // have a role
@@ -78,7 +74,7 @@ class SecuredQuery
             $ids = $this->user->getACLObjectIdsForRole($role);
 
             if(count($ids) == 0)
-                throw new \Exception('This user has no configured acls for role '.$role);
+                throw new \RuntimeException('This user has no configured acls for role '.$role);
 
             if($cond->hasThrough())
             {
