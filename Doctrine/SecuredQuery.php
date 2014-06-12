@@ -30,7 +30,7 @@ class SecuredQuery
 
         $this->user = $this->securityContext->getToken()->getUser();
         if(!($this->user instanceof SecuredEntityInterface))
-            throw new \Exception("The user doesn't implement SecuredEntityInterface");
+            throw new \RuntimeException("The user doesn't implement SecuredEntityInterface");
     }
     
     public function secure(QueryBuilder $query)
@@ -46,7 +46,7 @@ class SecuredQuery
 
         // this object isn't secured
         if(!$securedObject)
-             return $query;
+            return $query;
 
         $alias     = $from[0]->getAlias();
         $aliases   = array();
@@ -78,7 +78,7 @@ class SecuredQuery
             $ids = $this->user->getACLObjectIdsForRole($role);
 
             if(count($ids) == 0)
-                throw new \Exception('This user has no configured acls for role '.$role);
+                throw new \RuntimeException('This user has no configured acls for role '.$role);
 
             if($cond->hasThrough())
             {
@@ -130,12 +130,26 @@ class SecuredQuery
                          ->andWhere('('.end($aliases).'.'.$condition->getRelation()." = :$key )")
                          ->setParameter($key,$ref);
                 }
+                else
+                {
+                    $where = array();
+                    foreach($ids as $id)
+                    {
+                        $ref     = $this->queryBuilder->getEntityManager()->getReference($cond->getClass(),$id);
+                        $key     = end($aliases).$condition->getRelation().rand(0,50);
+                        $where[] = '('.end($aliases).'.'.$condition->getRelation()." = :$key )";
+
+                        $this->queryBuilder->setParameter($key,$ref);
+                    }
+
+                    $this->queryBuilder->andWhere( '('.implode(" OR ", $where).')');
+                }
             }
             else
                 throw new \InvalidArgumentException("The condition has neither fields nor classes - this should never be thrown");
         }
         else
-            throw new \Exception("This user has no roles");
+            throw new \RuntimeException("This user has no roles");
 
         return $this->queryBuilder;
     }
