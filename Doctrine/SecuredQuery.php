@@ -49,8 +49,7 @@ class SecuredQuery
             return $query;
 
         $alias     = $from[0]->getAlias();
-        $aliases   = array();
-        $aliases[] = $alias;
+        $aliases   = array($alias);
         $role      = false;
         $cond      = null;
 
@@ -62,12 +61,9 @@ class SecuredQuery
                 {
                     $role = $val;
                     $cond = $condition;
-                    break;
+                    break 2;
                 }
             }
-
-            if($role != false)
-                break;
         }
 
         if($role !== false) // have a role
