@@ -30,7 +30,7 @@ class BaseACL implements \Serializable
      * 
      * @ORM\Column(name="object_id",type="integer")
      */    
-    private $object_id;
+    protected $object_id;
     
     /**
      * @var integer $type
