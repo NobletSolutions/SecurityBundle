@@ -2,12 +2,10 @@
 
 namespace NS\SecurityBundle\Doctrine;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Annotations\AnnotationReader;
 use NS\SecurityBundle\Model\SecuredEntityInterface;
-use NS\SecurityBundle\Annotation\SecuredCondition;
-use NS\SecurityBundle\Annotation\SecuredPath;
 
 /**
  * Description of SecuredQuery
@@ -21,18 +19,18 @@ class SecuredQuery
     private $queryBuilder;
     private $user;
     private static $_alias_count = 30;
-    
-    public function __construct(SecurityContext $securityContext)
+
+    public function __construct(SecurityContextInterface $securityContext)
     {
         $this->securityContext = $securityContext;
         if(!$this->securityContext->getToken())
             return;
 
         $this->user = $this->securityContext->getToken()->getUser();
-        if(!($this->user instanceof SecuredEntityInterface))
+        if(!$this->user instanceof SecuredEntityInterface)
             throw new \RuntimeException("The user doesn't implement SecuredEntityInterface");
     }
-    
+
     public function secure(QueryBuilder $query)
     {
         if(!$this->user)

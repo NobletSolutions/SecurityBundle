@@ -2,7 +2,7 @@
 
 namespace NS\SecurityBundle\Model;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use \NS\SecurityBundle\Doctrine\SecuredQuery;
 use \NS\SecurityBundle\Model\SecuredRepositoryInterface;
 use \Doctrine\Common\Persistence\ObjectManager;
@@ -13,7 +13,7 @@ class Manager implements ObjectManager
     private $_securityContext;
     private $_securedQuery;
     
-    public function __construct(SecurityContext $securityContext, ObjectManager $em, SecuredQuery $sqb)
+    public function __construct(SecurityContextInterface $securityContext, ObjectManager $em, SecuredQuery $sqb)
     {
         $this->_em              = $em;
         $this->_securityContext = $securityContext;
@@ -41,7 +41,7 @@ class Manager implements ObjectManager
             $repo->setSecuredQuery($this->_securedQuery);
             $repo->setManager($this);
         }
-        
+
         return $repo;
     }
     
