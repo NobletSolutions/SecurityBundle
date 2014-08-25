@@ -13,16 +13,11 @@ use \Symfony\Component\Security\Core\User\UserInterface;
  */
 class ACLConverter
 {
-    private $roleHierarchy;
+    private $rHierarchy;
 
-    public function __construct(RoleHierarchyInterface $roleHierarchy, $roleClass)
+    public function __construct(RoleHierarchyInterface $rInterface)
     {
-        $this->roleHierarchy = $roleHierarchy;
-
-        if(!class_exists($roleClass))
-            throw new \RuntimeException("$roleClass does not exist");
-
-        $this->roleClass     = $roleClass;
+        $this->rHierarchy = $rInterface;
     }
 
     /**
@@ -35,29 +30,30 @@ class ACLConverter
     public function getObjectIdsForRole(TokenInterface $token, $irole)
     {
         $object_ids = array();
+        $reachable  = $this->rHierarchy->getReachableRoles($token->getRoles());
 
-        try
+        foreach($token->getUser()->getAcls() as $acl)
         {
-            $role = new $this->roleClass($irole);
-        }
-        catch(\UnexpectedValueException $e)
-        {
-            return null;
-        }
-
-        $acls  = $token->getUser()->getAcls();
-
-        if(empty($acls))
-            return null;
-
-        $roles = $this->roleHierarchy->getReachableRoles($token->getRoles());
-        die("<pre>".print_r($roles,true)."</pre> ".$irole." ".$role."<pre>".print_r($acls,true)."</pre>");
-        foreach($acls as $acl)
-        {
-            if($acl->getType()->equal($role)) // found an object id for this role
+            // found an object id for this role
+            if( $acl->getType()->equal($irole) )
+                $object_ids[] = $acl->getObjectId();
+            else if( $this->findInMap($acl, $reachable, $irole) )
                 $object_ids[] = $acl->getObjectId();
         }
 
         return $object_ids;
+    }
+
+    protected function findInMap($acl, $reachable, $role)
+    {
+        foreach($reachable as $r)
+        {
+            if($acl->getType()->equal($r->getRole()))
+                return true;
+        }
+
+        return false;
+//        die("Looking for $role <pre>".print_r($this->rHierarchy->getReachableRoles($token->getRoles()),true).print_r($this->hierarchy,true)."</pre>");
+//        return true;
     }
 }

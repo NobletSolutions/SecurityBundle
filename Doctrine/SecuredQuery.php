@@ -24,7 +24,7 @@ class SecuredQuery
 
     public function __construct(SecurityContextInterface $securityContext, \NS\SecurityBundle\Role\ACLConverter $aclRetriever)
     {
-        if(!$securityContext->getToken())
+        if(is_null($securityContext) || !$securityContext->getToken())
             return;
 
         $this->securityContext = $securityContext;
@@ -35,29 +35,10 @@ class SecuredQuery
         $this->aclRetriever = $aclRetriever;
     }
 
-    public function getRole($securedObject, &$role, &$cond)
-    {
-        foreach($securedObject->getConditions() as $condition)
-        {
-            foreach($condition->getRoles() as $val)
-            {
-                if($this->securityContext->isGranted($val))
-                {
-                    $role = $val;
-                    $cond = $condition;
-                    break 2;
-                }
-            }
-        }
-    }
-
     public function secure(QueryBuilder $query)
     {
-        if(!$this->securityContext->getToken()->getUser())
-        {
-            throw new \RuntimeException("No User");
-//            return $query;
-        }
+        if(!$this->securityContext || !$this->securityContext->getToken())
+            return $query;
 
         $this->queryBuilder = $query;
         $from               = $this->queryBuilder->getDQLPart('from');
@@ -67,10 +48,7 @@ class SecuredQuery
 
         // this object isn't secured
         if(!$securedObject)
-        {
-            throw new \RuntimeException("$class is not a secured Object");
-//            return $query;
-        }
+            return $query;
 
         $alias     = $from[0]->getAlias();
         $aliases   = array($alias);
@@ -103,6 +81,22 @@ class SecuredQuery
             throw new \RuntimeException("This user has no roles");
 
         return $this->queryBuilder;
+    }
+
+    protected function getRole($securedObject, &$role, &$cond)
+    {
+        foreach($securedObject->getConditions() as $condition)
+        {
+            foreach($condition->getRoles() as $val)
+            {
+                if($this->securityContext->isGranted($val))
+                {
+                    $role = $val;
+                    $cond = $condition;
+                    break 2;
+                }
+            }
+        }
     }
 
     protected function handleRelation($cond, array $ids, array &$aliases)
@@ -149,27 +143,28 @@ class SecuredQuery
         foreach($cond->getThrough() as $association)
         {
             $joins = $this->queryBuilder->getDQLPart('join');
-            $found = false;
 
-            if(isset($joins[$alias]))
-            {
-                foreach($joins[$alias] as $join)
-                {
-                    if($join->getJoin() == "$alias.$association")
-                    {
-                        $found = true;
-                        $aliases[] = $join->getAlias();
-                    }
-                }
-            }
-
-            if(!$found)
+            if(isset($joins[$alias]) && !$this->findJoin($joins, $alias, $association, $aliases))
             {
                 $newalias = strtolower(substr($association,0,3)).self::$_alias_count++;
                 $this->queryBuilder->leftJoin(end($aliases).'.'.$association, $newalias);
                 $aliases[] = $newalias;
             }
         }
+    }
+
+    protected function findJoin(array $joins, $alias, $association, array &$aliases)
+    {
+        foreach($joins[$alias] as $join)
+        {
+            if($join->getJoin() == "$alias.$association")
+            {
+                $aliases[] = $join->getAlias();
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getSecurityConditions()
