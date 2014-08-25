@@ -2,8 +2,6 @@
 
 namespace NS\SecurityBundle\Annotation;
 
-use Doctrine\Common\Annotations\Reader;
-
 /**
  * Description of SecuredCondition
  * @Annotation
