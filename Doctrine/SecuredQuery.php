@@ -100,9 +100,9 @@ class SecuredQuery
         if(count($ids) == 1)
         {
             $ref = $this->queryBuilder->getEntityManager()->getReference($cond->getClass(),current($ids));
-            $key = end($aliases).$cond->getRelation().rand(0,50);
+            $key = $this->getKey($cond, $aliases);
             $this->queryBuilder
-                 ->andWhere('('.end($aliases).'.'.$cond->getRelation()." = :$key )")
+                 ->andWhere('('.end($aliases).'.'.$cond->getRelation()." = $key )")
                  ->setParameter($key,$ref);
         }
         else
@@ -111,8 +111,8 @@ class SecuredQuery
             foreach($ids as $id)
             {
                 $ref     = $this->queryBuilder->getEntityManager()->getReference($cond->getClass(),$id);
-                $key     = end($aliases).$cond->getRelation().rand(0,50);
-                $where[] = '('.end($aliases).'.'.$cond->getRelation()." = :$key )";
+                $key = $this->getKey($cond, $aliases);
+                $where[] = '('.end($aliases).'.'.$cond->getRelation()." = $key )";
 
                 $this->queryBuilder->setParameter($key,$ref);
             }
@@ -127,11 +127,16 @@ class SecuredQuery
             $this->queryBuilder->andWhere($this->queryBuilder->expr()->in(end($aliases).'.'.$cond->getField(),$ids));
         else if(count($ids) == 1)
         {
-            $key = end($aliases).$cond->getField().rand(0,50);
+            $key = $this->getKey($cond, $aliases);
             $this->queryBuilder
-                 ->andWhere('('.end($aliases).'.'.$cond->getField()." = :$key )")
+                 ->andWhere('('.end($aliases).'.'.$cond->getField()." = $key )")
                  ->setParameter($key,current($ids));
         }
+    }
+
+    protected function getKey($condition,array $aliases)
+    {
+        return ":".end($aliases).$condition->getField().rand(0,50);
     }
 
     protected function handleThrough($cond, $alias, array &$aliases)
