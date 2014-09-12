@@ -116,7 +116,6 @@ class SecuredQuery
                 $ref     = $em->getReference($cond->getClass(),$id);
                 $key     = $this->getKey($cond, $aliases);
                 $where[] = sprintf('(%s.%s = %s)',end($aliases),$cond->getRelation(),$key);
-
                 $this->queryBuilder->setParameter($key,$ref);
             }
 
@@ -142,7 +141,9 @@ class SecuredQuery
 
     protected function getKey($condition,array $aliases)
     {
-        return ":".end($aliases).$condition->getField().rand(0,50);
+        static $_key = 49;
+
+        return sprintf(":%s%s%s",end($aliases),$condition->getField(),$_key++);
     }
 
     protected function handleThrough($cond, $alias, array &$aliases)
