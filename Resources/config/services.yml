@@ -4,7 +4,7 @@ parameters:
 services:
   ns.security.acl_converter:
     class: NS\SecurityBundle\Role\ACLConverter
-    arguments: [ @security.role_hierarchy, NS\SentinelBundle\Form\Types\Role ]
+    arguments: [ @security.role_hierarchy ]
   ns.security.query:
     class: %ns.security.query%
     arguments: [ @security.context, @ns.security.acl_converter ]
