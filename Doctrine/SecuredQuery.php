@@ -2,10 +2,12 @@
 
 namespace NS\SecurityBundle\Doctrine;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\Common\Annotations\AnnotationReader;
-use NS\SecurityBundle\Model\SecuredEntityInterface;
+use \Doctrine\Common\Annotations\AnnotationReader;
+use \Doctrine\ORM\QueryBuilder;
+use \NS\SecurityBundle\Model\SecuredEntityInterface;
+use \NS\SecurityBundle\Role\ACLConverter;
+use \Symfony\Component\Security\Core\SecurityContextInterface;
+use \Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Description of SecuredQuery
@@ -22,9 +24,9 @@ class SecuredQuery
 
     private static $_alias_count = 30;
 
-    public function __construct(SecurityContextInterface $securityContext, \NS\SecurityBundle\Role\ACLConverter $aclRetriever)
+    public function __construct(SecurityContextInterface $securityContext, ACLConverter $aclRetriever)
     {
-        if(!$securityContext->getToken())
+        if(is_null($securityContext) || !$securityContext->getToken() || !$securityContext->getToken()->getUser() instanceof UserInterface)
             return;
 
         $this->securityContext = $securityContext;
