@@ -4,10 +4,8 @@ namespace NS\SecurityBundle\Doctrine;
 
 use \Doctrine\Common\Annotations\AnnotationReader;
 use \Doctrine\ORM\QueryBuilder;
-use \NS\SecurityBundle\Model\SecuredEntityInterface;
 use \NS\SecurityBundle\Role\ACLConverter;
 use \Symfony\Component\Security\Core\SecurityContextInterface;
-use \Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Description of SecuredQuery
@@ -19,22 +17,14 @@ class SecuredQuery
     private $securityContext;
     private $securityConditions;
     private $queryBuilder;
-    private $user;
     private $aclRetriever;
 
     private static $_alias_count = 30;
 
     public function __construct(SecurityContextInterface $securityContext, ACLConverter $aclRetriever)
     {
-        if(is_null($securityContext) || !$securityContext->getToken() || !$securityContext->getToken()->getUser() instanceof UserInterface)
-            return;
-
         $this->securityContext = $securityContext;
-
-        if(!$this->securityContext->getToken()->getUser() instanceof SecuredEntityInterface)
-            throw new \RuntimeException("The user doesn't implement SecuredEntityInterface");
-
-        $this->aclRetriever = $aclRetriever;
+        $this->aclRetriever    = $aclRetriever;
     }
 
     public function secure(QueryBuilder $query)
