@@ -2,17 +2,16 @@
 
 namespace NS\SecurityBundle\Annotation;
 
-use Doctrine\Common\Annotations\Reader;
-
 /**
  * Description of Secured
  * @Annotation
  * @author gnat
+ * @Target({"CLASS"})
  */
 class Secured
 {
     private $conditions;
-    
+
     public function __construct($options)
     {
         if(isset($options['conditions']))
