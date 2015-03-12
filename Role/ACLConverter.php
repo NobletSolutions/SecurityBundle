@@ -30,15 +30,15 @@ class ACLConverter
     public function getObjectIdsForRole(TokenInterface $token, $irole)
     {
         $object_ids = array();
-        $reachable  = $this->rHierarchy->getReachableRoles($token->getRoles());
+        $reachable  = $this->getRoleHierarchy()->getReachableRoles($token->getRoles());
 
         foreach($token->getUser()->getAcls() as $acl)
         {
             // found an object id for this role
-            if( $acl->getType()->equal($irole) )
+            if ($acl->getType()->equal($irole) || $this->findInMap($acl, $reachable, $irole))
+            {
                 $object_ids[] = $acl->getObjectId();
-            else if( $this->findInMap($acl, $reachable, $irole) )
-                $object_ids[] = $acl->getObjectId();
+            }
         }
 
         return $object_ids;
@@ -53,7 +53,10 @@ class ACLConverter
         }
 
         return false;
-//        die("Looking for $role <pre>".print_r($this->rHierarchy->getReachableRoles($token->getRoles()),true).print_r($this->hierarchy,true)."</pre>");
-//        return true;
+    }
+
+    public function getRoleHierarchy()
+    {
+        return $this->rHierarchy;
     }
 }
