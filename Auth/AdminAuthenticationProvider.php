@@ -1,16 +1,19 @@
 <?php
+
 namespace NS\SecurityBundle\Auth;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use \Doctrine\ORM\NoResultException;
 use \Symfony\Component\Security\Core\Authentication\Provider\UserAuthenticationProvider;
-
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use \Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use \Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use \Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use \Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
+use \Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use \Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use \Symfony\Component\Security\Core\Role\SwitchUserRole;
+use \Symfony\Component\Security\Core\User\UserCheckerInterface;
+use \Symfony\Component\Security\Core\User\UserInterface;
+use \Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * Description of UsernamePasswordPracticeAuthenticationProvider
@@ -20,23 +23,23 @@ use \Symfony\Component\Security\Core\Role\SwitchUserRole;
 class AdminAuthenticationProvider extends UserAuthenticationProvider
 {
     private $encoderFactory;
+
     private $userProvider;
+
     private $providerKey;
+
     private $hideUserNotFoundException;
+
     private $userChecker;
- 
+
     /**
-     * @param \Symfony\Component\Security\Core\User\UserProviderInterface $userProvider
+     * @param UserProviderInterface $userProvider
      * @param UserCheckerInterface $userChecker
      * @param $providerKey
      * @param EncoderFactoryInterface $encoderFactory
      * @param bool $hideUserNotFoundExceptions
      */
-    public function __construct( $userProvider, 
-                                 $userChecker, 
-                                 $providerKey, 
-                                 EncoderFactoryInterface $encoderFactory, 
-                                 $hideUserNotFoundExceptions = true)
+    public function __construct($userProvider, $userChecker, $providerKey, EncoderFactoryInterface $encoderFactory, $hideUserNotFoundExceptions = true)
     {
         parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
         $this->encoderFactory            = $encoderFactory;
@@ -48,61 +51,59 @@ class AdminAuthenticationProvider extends UserAuthenticationProvider
 
     public function retrieveUser($username, UsernamePasswordToken $token)
     {
-        try
-        {
+        try {
             return $this->userProvider->loadUserByUsername($username);
         }
-        catch(Doctrine\ORM\NoResultException $e)
-        {
+        catch (NoResultException $e) {
             return null;
         }
     }
 
     public function authenticate(TokenInterface $token)
     {
-        if (!$this->supports($token))
+        if (!$this->supports($token)) {
             return null;
+        }
 
         $adminUsername = $token->getUsername();
-        if($token->hasAttribute('desired_user'))
-            $username  = $token->getAttribute('desired_user');
+        if ($token->hasAttribute('desired_user')) {
+            $username = $token->getAttribute('desired_user');
+        }
 
-        try
-        {
+        try {
             $adminUser = $this->retrieveUser($adminUsername, $token);
             $user      = (empty($username)) ? $adminUser : $this->retrieveUser($username, $token);
         }
-        catch (UsernameNotFoundException $notFound)
-        {
-            if ($this->hideUserNotFoundException)
+        catch (UsernameNotFoundException $notFound) {
+            if ($this->hideUserNotFoundException) {
                 throw new BadCredentialsException('Bad credentials', 0, $notFound);
+            }
 
             throw $notFound;
         }
 
-        if (!$adminUser instanceof UserInterface)
+        if (!$adminUser instanceof UserInterface) {
             throw new AuthenticationServiceException('retrieveUser() must return a UserInterface.');
+        }
 
-        try
-        {
+        try {
             $this->userChecker->checkPreAuth($user);
             $this->checkAuthentication($adminUser, $token);
             $this->userChecker->checkPostAuth($user);
         }
-        catch (BadCredentialsException $e)
-        {
-            if ($this->hideUserNotFoundException)
+        catch (BadCredentialsException $e) {
+            if ($this->hideUserNotFoundException) {
                 throw new BadCredentialsException('Bad credentials', 0, $e);
+            }
 
             throw $e;
         }
-        
+
         $attributes = $token->getAttributes();
         $roles      = $user->getRoles();
-        
-        if($token->hasAttribute('desired_user'))
-        {
-            $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', new UsernamePasswordToken($adminUser,$adminUser->getPassword(),$this->providerKey,$adminUser->getRoles()));
+
+        if ($token->hasAttribute('desired_user')) {
+            $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', new UsernamePasswordToken($adminUser, $adminUser->getPassword(), $this->providerKey, $adminUser->getRoles()));
             unset($attributes['desired_user']);
         }
 
@@ -115,25 +116,26 @@ class AdminAuthenticationProvider extends UserAuthenticationProvider
     {
         $currentUser = $token->getUser();
 
-        if($currentUser instanceof UserInterface) // this happens if we were already logged in
-        {
-            if ($currentUser->getPassword() !== $user->getPassword())
+        if ($currentUser instanceof UserInterface) { // this happens if we were already logged in
+            if ($currentUser->getPassword() !== $user->getPassword()) {
                 throw new BadCredentialsException('The credentials were changed from another session.');
+            }
         }
-        else 
-        {
-            if ("" === ($presentedPassword = $token->getCredentials()))
+        else {
+            if ("" === ($presentedPassword = $token->getCredentials())) {
                 throw new BadCredentialsException('The presented password cannot be empty.');
+            }
 
-            if (!$this->encoderFactory->getEncoder($user)->isPasswordValid($user->getPassword(), $presentedPassword, $user->getSalt()))
+            if (!$this->encoderFactory->getEncoder($user)->isPasswordValid($user->getPassword(), $presentedPassword, $user->getSalt())) {
                 throw new BadCredentialsException('The presented password is invalid.');
+            }
         }
 
-        if($token->hasAttribute('desired_user'))
-        {
+        if ($token->hasAttribute('desired_user')) {
             $roles = $user->getRoles();
-            if(!in_array('ROLE_ALLOWED_TO_SWITCH', $roles))
+            if (!in_array('ROLE_ALLOWED_TO_SWITCH', $roles)) {
                 throw new BadCredentialsException('You are not allowed to login as other users.');
+            }
         }
     }
 }
