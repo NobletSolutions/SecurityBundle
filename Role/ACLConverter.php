@@ -4,7 +4,6 @@ namespace NS\SecurityBundle\Role;
 
 use \Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use \Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use \Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Description of ACLConverter
@@ -15,6 +14,10 @@ class ACLConverter
 {
     private $rHierarchy;
 
+    /**
+     *
+     * @param RoleHierarchyInterface $rInterface
+     */
     public function __construct(RoleHierarchyInterface $rInterface)
     {
         $this->rHierarchy = $rInterface;
@@ -22,7 +25,7 @@ class ACLConverter
 
     /**
      *
-     * @param UserInterface $user   - Array of ACL objects to check
+     * @param TokenInterface $token - Array of ACL objects to check
      * @param type $irole           - Requested Role
      * 
      * @return array
@@ -32,11 +35,9 @@ class ACLConverter
         $object_ids = array();
         $reachable  = $this->getRoleHierarchy()->getReachableRoles($token->getRoles());
 
-        foreach($token->getUser()->getAcls() as $acl)
-        {
+        foreach($token->getUser()->getAcls() as $acl) {
             // found an object id for this role
-            if ($acl->getType()->equal($irole) || $this->findInMap($acl, $reachable, $irole))
-            {
+            if ($acl->getType()->equal($irole) || $this->findInMap($acl, $reachable)) {
                 $object_ids[] = $acl->getObjectId();
             }
         }
@@ -44,17 +45,27 @@ class ACLConverter
         return $object_ids;
     }
 
-    protected function findInMap($acl, $reachable, $role)
+    /**
+     *
+     * @param ACL $acl
+     * @param array $reachable
+     * @return boolean
+     */
+    protected function findInMap($acl, $reachable)
     {
-        foreach($reachable as $r)
-        {
-            if($acl->getType()->equal($r->getRole()))
+        foreach($reachable as $role) {
+            if($acl->getType()->equal($role->getRole())) {
                 return true;
+            }
         }
 
         return false;
     }
 
+    /**
+     *
+     * @return RoleHierarchyInterface
+     */
     public function getRoleHierarchy()
     {
         return $this->rHierarchy;
