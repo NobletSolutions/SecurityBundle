@@ -1,10 +1,14 @@
 parameters:
-    ns.security.query: NS\SecurityBundle\Doctrine\SecuredQuery
+    ns.security.query.class: NS\SecurityBundle\Doctrine\SecuredQuery
+    ns.security.acl_converter.class: NS\SecurityBundle\Role\ACLConverter
 
 services:
+  ns.security.acl_converter:
+    class: %ns.security.acl_converter.class%
+    arguments: [ @security.role_hierarchy ]
   ns.security.query:
-    class: %ns.security.query%
-    arguments: [ "@security.context" ]
+    class: %ns.security.query.class%
+    arguments: [ @security.context, @ns.security.acl_converter ]
   ns.model_manager:
       class: NS\SecurityBundle\Model\Manager
       arguments: [ "@security.context", "@doctrine.orm.entity_manager", "@ns.security.query" ]
