@@ -6,18 +6,26 @@ services:
   ns.security.acl_converter:
     class: %ns.security.acl_converter.class%
     arguments: [ @security.role_hierarchy ]
+
   ns.security.query:
     class: %ns.security.query.class%
     arguments: [ @security.context, @ns.security.acl_converter ]
+
   ns.model_manager:
+      public: false
       class: NS\SecurityBundle\Model\Manager
-      arguments: [ "@security.context", "@doctrine.orm.entity_manager", "@ns.security.query" ]
+      decorates: doctrine.orm.default_entity_manager
+      arguments: [ @ns.model_manager.inner ]
+      calls:
+        - [ setContainer, [ @service_container ]]
+
   ns.security.authentication.listener:
     class: NS\SecurityBundle\Auth\AdminListener
     parent: security.authentication.listener.abstract
     abstract: true
+
   security.authentication_provider.ns_security:
     class: NS\SecurityBundle\Auth\AdminAuthenticationProvider
     abstract: true
     public: false
-    arguments: [ '', "@security.user_checker", '', "@security.encoder_factory", "%security.authentication.hide_user_not_found%" ]
+    arguments: [ '', @security.user_checker, '', @security.encoder_factory, %security.authentication.hide_user_not_found% ]
