@@ -40,28 +40,33 @@ class BaseACL implements \Serializable
     protected $type;
 
     /**
-     *
      * @var DateTime $valid_from
      * @ORM\Column(name="valid_from",type="datetime",nullable=true)
      */
-    private $valid_from;
+    protected $valid_from;
     
     /**
-     *
      * @var DateTime $valid_to
      * @ORM\Column(name="valid_to",type="datetime",nullable=true)
      */    
-    private $valid_to;
+    protected $valid_to;
 
+    /**
+     * @return integer
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return var_export($this, true);
     }
+
     /**
      * Set user_id
      *
@@ -134,10 +139,10 @@ class BaseACL implements \Serializable
     /**
      * Set valid_from
      *
-     * @param \timestamp $validFrom
+     * @param \DateTime $validFrom
      * @return ACL
      */
-    public function setValidFrom($validFrom)
+    public function setValidFrom(\DateTime $validFrom = null)
     {
         $this->valid_from = $validFrom;
     
@@ -147,7 +152,7 @@ class BaseACL implements \Serializable
     /**
      * Get valid_from
      *
-     * @return \timestamp 
+     * @return \DateTime
      */
     public function getValidFrom()
     {
@@ -157,10 +162,10 @@ class BaseACL implements \Serializable
     /**
      * Set valid_to
      *
-     * @param \timestamp $validTo
+     * @param \DateTime $validTo
      * @return ACL
      */
-    public function setValidTo($validTo)
+    public function setValidTo(\DateTime $validTo = null)
     {
         $this->valid_to = $validTo;
     
@@ -170,7 +175,7 @@ class BaseACL implements \Serializable
     /**
      * Get valid_to
      *
-     * @return \timestamp 
+     * @return \DateTime
      */
     public function getValidTo()
     {
