@@ -9,7 +9,7 @@ services:
 
   ns.security.query:
     class: %ns.security.query.class%
-    arguments: [ @security.context, @ns.security.acl_converter ]
+    arguments: [ @security.token_storage, @security.authorization_checker, @ns.security.acl_converter ]
 
   ns.model_manager:
       public: false

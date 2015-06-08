@@ -8,6 +8,5 @@ namespace NS\SecurityBundle\Model;
  */
 interface SecuredRepositoryInterface
 {
-    public function setSecurityContext($security);
     public function setSecuredQuery($qb);
 }

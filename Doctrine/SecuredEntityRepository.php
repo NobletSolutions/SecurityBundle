@@ -2,9 +2,9 @@
 
 namespace NS\SecurityBundle\Doctrine;
 
-use Doctrine\ORM\EntityRepository;
-use NS\SecurityBundle\Model\SecuredRepositoryInterface;
-use Doctrine\ORM\QueryBuilder;
+use \Doctrine\ORM\EntityRepository;
+use \NS\SecurityBundle\Model\SecuredRepositoryInterface;
+use \Doctrine\ORM\QueryBuilder;
 
 /**
  * Description of SecuredEntityRepository
@@ -13,56 +13,44 @@ use Doctrine\ORM\QueryBuilder;
  */
 class SecuredEntityRepository extends EntityRepository implements SecuredRepositoryInterface
 {
-    private $_security;
-    private $_queryBuilder;
-    private $_manager;
+    private $queryBuilder;
+    private $entityMgr;
     
-    public function setSecurityContext($security)
-    {
-        $this->_security = $security;
-
-        return $this;
-    }
-
-    public function getSecurityContext()
-    {
-        return $this->_security;
-    }
-
     public function setSecuredQuery($qb)
     {
-        $this->_queryBuilder = $qb;
+        $this->queryBuilder = $qb;
 
         return $this;
     }
 
     public function getSecuredQuery()
     {
-        return $this->_queryBuilder;
+        return $this->queryBuilder;
     }
 
     public function hasSecuredQuery()
     {
-        return $this->_queryBuilder != null;
+        return $this->queryBuilder != null;
     }
 
     public function secure(QueryBuilder $qb)
     {
-        if($this->_queryBuilder)
-            return $this->_queryBuilder->secure($qb);
+        if($this->queryBuilder) {
+            return $this->queryBuilder->secure($qb);
+        }
 
         throw new \RuntimeException("Calling secure on a non-object");
     }
 
     public function setManager($manager)
     {
-        $this->_manager = $manager;
+        $this->entityMgr = $manager;
 
         return $this;
     }
 
     public function getManager()
     {
-        return $this->_manager;
+        return $this->entityMgr;
     }
 }

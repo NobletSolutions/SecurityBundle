@@ -1,20 +1,17 @@
 <?php
 namespace NS\SecurityBundle\Auth;
 
-use \Symfony\Component\Security\Http\Firewall\AbstractAuthenticationListener;
-use \Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
-use \Symfony\Component\Security\Http\HttpUtils;
-use \Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
-use \Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
-
-use \Symfony\Component\Security\Core\SecurityContextInterface;
-use \Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-
+use \NS\SecurityBundle\Doctrine\Security;
+use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpKernel\Log\LoggerInterface;
-use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use \Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use \Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use \Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use \Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
+use \Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use \Symfony\Component\Security\Http\Firewall\AbstractAuthenticationListener;
+use \Symfony\Component\Security\Http\HttpUtils;
+use \Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
 /**
  * Description of PracticeListener
@@ -23,24 +20,12 @@ use \Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  */
 class AdminListener extends AbstractAuthenticationListener
 {
-    private $csrfProvider;
-
     /**
      * {@inheritdoc}
      */
-    public function __construct(SecurityContextInterface $securityContext, 
-                                AuthenticationManagerInterface $authenticationManager, 
-                                SessionAuthenticationStrategyInterface $sessionStrategy, 
-                                HttpUtils $httpUtils, 
-                                $providerKey, 
-                                AuthenticationSuccessHandlerInterface $successHandler, 
-                                AuthenticationFailureHandlerInterface $failureHandler, 
-                                array $options = array(), 
-                                LoggerInterface $logger = null, 
-                                EventDispatcherInterface $dispatcher = null, 
-                                CsrfProviderInterface $csrfProvider = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
-        parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, $failureHandler, array_merge(array(
+        parent::__construct($tokenStorage, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, $failureHandler, array_merge(array(
             'username_parameter' => '_username',
             'password_parameter' => '_password',
             'user_parameter'     => '_user',
@@ -48,8 +33,6 @@ class AdminListener extends AbstractAuthenticationListener
             'intention'          => 'authenticate',
             'post_only'          => true,
         ), $options), $logger, $dispatcher);
-
-        $this->csrfProvider = $csrfProvider;
     }
     
     /**
@@ -78,24 +61,17 @@ class AdminListener extends AbstractAuthenticationListener
             return null;
         }
 
-        if (null !== $this->csrfProvider) {
-            $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
-
-            if (false === $this->csrfProvider->isCsrfTokenValid($this->options['intention'], $csrfToken)) {
-                throw new InvalidCsrfTokenException('Invalid CSRF token.');
-            }
-        }
-
         $username = trim($request->get($this->options['username_parameter'], null, true));
         $password = $request->get($this->options['password_parameter'], null, true);
         $user     = $request->get($this->options['user_parameter'], null, true);
-        $t        = new UsernamePasswordToken($username, $password, $this->providerKey);
+        $token    = new UsernamePasswordToken($username, $password, $this->providerKey);
 
-        if(null != $user)
-            $t->setAttribute('desired_user',$user);
-        
-        $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
+        if(null != $user) {
+            $token->setAttribute('desired_user',$user);
+        }
 
-        return $this->authenticationManager->authenticate($t);
+        $request->getSession()->set(Security::LAST_USERNAME, $username);
+
+        return $this->authenticationManager->authenticate($token);
     }
 }

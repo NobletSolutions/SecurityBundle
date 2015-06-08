@@ -5,7 +5,8 @@ namespace NS\SecurityBundle\Doctrine;
 use \Doctrine\Common\Annotations\AnnotationReader;
 use \Doctrine\ORM\QueryBuilder;
 use \NS\SecurityBundle\Role\ACLConverter;
-use \Symfony\Component\Security\Core\SecurityContextInterface;
+use \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
+use \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Description of SecuredQuery
@@ -14,25 +15,25 @@ use \Symfony\Component\Security\Core\SecurityContextInterface;
  */
 class SecuredQuery
 {
-    private $securityContext;
+    private $tokenStorage;
     private $queryBuilder;
     private $aclRetriever;
+    private $authChecker;
 
     private static $aliasCount = 30;
 
     /**
-     *
-     * @param SecurityContextInterface $securityContext
+     * @param SecurityContextInterface $tokenStorage
      * @param ACLConverter $aclRetriever
      */
-    public function __construct(SecurityContextInterface $securityContext, ACLConverter $aclRetriever)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authChecker, ACLConverter $aclRetriever)
     {
-        $this->securityContext = $securityContext;
-        $this->aclRetriever    = $aclRetriever;
+        $this->tokenStorage = $tokenStorage;
+        $this->authChecker  = $authChecker;
+        $this->aclRetriever = $aclRetriever;
     }
 
     /**
-     *
      * @param QueryBuilder $query
      * @return QueryBuilder
      * @throws \RuntimeException
@@ -40,7 +41,7 @@ class SecuredQuery
      */
     public function secure(QueryBuilder $query)
     {
-        if(!$this->securityContext || !$this->securityContext->getToken()) {
+        if(!$this->tokenStorage || !$this->tokenStorage->getToken()) {
             return $query;
         }
 
@@ -66,7 +67,7 @@ class SecuredQuery
                 return $query;
             }
 
-            $ids = $this->aclRetriever->getObjectIdsForRole($this->securityContext->getToken(), $role);
+            $ids = $this->aclRetriever->getObjectIdsForRole($this->tokenStorage->getToken(), $role);
 
             if(count($ids) == 0){
                 throw new \RuntimeException('This user has no configured acls for role '.$role);
@@ -79,7 +80,7 @@ class SecuredQuery
             if($condition->hasField()){
                 $this->handleField($condition, $ids, $aliases);
             }
-            else if($condition->hasRelation()) {
+            elseif($condition->hasRelation()) {
                 $this->handleRelation($condition, $ids, $aliases);
             }
             else {
@@ -95,12 +96,10 @@ class SecuredQuery
 
     protected function getRole($securedObject)
     {
-        foreach($securedObject->getConditions() as $condition)
-        {
-            foreach($condition->getRoles() as $val)
-            {
-                if($this->securityContext->isGranted($val)) {
-                    return array($val,$condition);
+        foreach ($securedObject->getConditions() as $condition) {
+            foreach ($condition->getRoles() as $val) {
+                if ($this->authChecker->isGranted($val)) {
+                    return array($val, $condition);
                 }
             }
         }
@@ -159,17 +158,16 @@ class SecuredQuery
     {
         $joins = $this->queryBuilder->getDQLPart('join');
 
-        foreach($cond->getThrough() as $association)
-        {
+        foreach ($cond->getThrough() as $association) {
             $found = false;
 
-            if(isset($joins[$alias])) {
+            if (isset($joins[$alias])) {
                 $found = $this->findJoin($joins, $alias, $association, $aliases);
             }
 
-            if(!$found) {
-                $newalias = strtolower(substr($association,0,3)).self::$aliasCount++;
-                $this->queryBuilder->leftJoin(end($aliases).'.'.$association, $newalias);
+            if (!$found) {
+                $newalias  = strtolower(substr($association, 0, 3)) . self::$aliasCount++;
+                $this->queryBuilder->leftJoin(end($aliases) . '.' . $association, $newalias);
                 $aliases[] = $newalias;
             }
         }

@@ -17,15 +17,16 @@ class Manager extends EntityManagerDecorator implements ContainerAwareInterface
     public function getRepository($class)
     {
         $repo = $this->wrapped->getRepository($class);
-        if ($repo && $repo instanceof SecuredRepositoryInterface)
-        {
-            $repo->setSecurityContext($this->container->get('security.context'));
+        if ($repo && $repo instanceof SecuredRepositoryInterface) {
             $repo->setSecuredQuery($this->container->get('ns.security.query'));
         }
 
         return $repo;
     }
 
+    /**
+     * @param ContainerInterface $container
+     */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
