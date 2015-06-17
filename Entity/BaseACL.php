@@ -28,7 +28,7 @@ class BaseACL implements \Serializable
     /**
      * @var integer $object_id
      * 
-     * @ORM\Column(name="object_id",type="integer")
+     * @ORM\Column(name="object_id",type="integer",nullable=true)
      */    
     protected $object_id;
     
