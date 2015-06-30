@@ -1,11 +1,12 @@
 <?php
 namespace NS\SecurityBundle\Auth;
 
-use \NS\SecurityBundle\Doctrine\Security;
+use \Symfony\Component\Security\Core\Security;
 use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpKernel\Log\LoggerInterface;
 use \Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use \Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use \Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use \Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;

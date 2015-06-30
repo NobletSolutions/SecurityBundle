@@ -5,8 +5,9 @@ namespace NS\SecurityBundle\Doctrine;
 use \Doctrine\Common\Annotations\AnnotationReader;
 use \Doctrine\ORM\QueryBuilder;
 use \NS\SecurityBundle\Role\ACLConverter;
-use \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
+use \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use \Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * Description of SecuredQuery
