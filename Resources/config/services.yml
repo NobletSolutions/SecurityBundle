@@ -10,6 +10,7 @@ services:
   ns.security.query:
     class: %ns.security.query.class%
     arguments: [ @security.token_storage, @security.authorization_checker, @ns.security.acl_converter ]
+    lazy: true
 
   ns.model_manager:
       public: false
