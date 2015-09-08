@@ -26,18 +26,18 @@ class ACLConverter
     /**
      *
      * @param TokenInterface $token - Array of ACL objects to check
-     * @param type $irole           - Requested Role
+     * @param string $inputRole           - Requested Role
      * 
      * @return array
      */
-    public function getObjectIdsForRole(TokenInterface $token, $irole)
+    public function getObjectIdsForRole(TokenInterface $token, $inputRole)
     {
         $object_ids = array();
         $reachable  = $this->getRoleHierarchy()->getReachableRoles($token->getRoles());
 
         foreach($token->getUser()->getAcls() as $acl) {
             // found an object id for this role
-            if ($acl->getType()->equal($irole) || $this->findInMap($acl, $reachable)) {
+            if ($acl->getType()->equal($inputRole) || $this->findInMap($acl, $reachable)) {
                 $object_ids[] = $acl->getObjectId();
             }
         }
