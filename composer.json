@@ -3,6 +3,7 @@
     "type": "symfony-bundle",
     "description": "This Bundle provides a basic database row level ACL system",
     "minimum-stability": "stable",
+    "license": "MIT",
     "authors": [
         {
             "name": "Nathanael David Noblet",
