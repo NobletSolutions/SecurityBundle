@@ -18,9 +18,8 @@
     },
 
     "autoload": {
-        "psr-0": { "NS\\SecurityBundle": "" }
+        "psr-4": { "NS\\SecurityBundle\\": "" }
     },
-    "target-dir": "NS/SecurityBundle",
     "require-dev": {
         "liip/rmt": "1.*"
     }
