@@ -43,13 +43,14 @@ class SecuredEntityRepository extends EntityRepository implements SecuredReposit
 
     public function hasSecuredQuery()
     {
-        return $this->_queryBuilder != null;
+        return $this->_queryBuilder !== null;
     }
 
     public function secure(QueryBuilder $qb)
     {
-        if($this->_queryBuilder)
+        if ($this->_queryBuilder) {
             return $this->_queryBuilder->secure($qb);
+        }
 
         throw new \RuntimeException("Calling secure on a non-object");
     }

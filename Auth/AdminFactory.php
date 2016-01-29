@@ -1,4 +1,5 @@
 <?php
+
 namespace NS\SecurityBundle\Auth;
 
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -36,3 +37,4 @@ class AdminFactory extends FormLoginFactory
         return $provider;
     }
 }
+

@@ -9,6 +9,7 @@ use \Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandler
 
 use \Symfony\Component\Security\Core\SecurityContextInterface;
 use \Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use \Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpKernel\Log\LoggerInterface;
@@ -91,11 +92,13 @@ class AdminListener extends AbstractAuthenticationListener
         $user     = $request->get($this->options['user_parameter'], null, true);
         $t        = new UsernamePasswordToken($username, $password, $this->providerKey);
 
-        if(null != $user)
+        if(null !== $user) {
             $t->setAttribute('desired_user',$user);
-        
+        }
+
         $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
 
         return $this->authenticationManager->authenticate($t);
     }
 }
+

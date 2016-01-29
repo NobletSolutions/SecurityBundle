@@ -2,7 +2,6 @@
 
 namespace NS\SecurityBundle\Annotation;
 
-use Doctrine\Common\Annotations\Reader;
 
 /**
  * Description of SecuredPath
@@ -18,18 +17,21 @@ class SecuredPath
 
     public function __construct($options)
     {
-        if(isset($options['paths']))
+        if (isset($options['paths'])) {
             $this->paths = (is_array($options['paths'])) ? $options['paths'] : array($options['paths']);
-        else
+        } else {
             throw new \Exception("Missing required property 'paths'");
+        }
 
-        if(isset($options['enabled']))
+        if (isset($options['enabled'])) {
             $this->enabled = (bool)$options['enabled'];
+        }
 
-        if(isset($options['field']))
+        if (isset($options['field'])) {
             $this->field = $options['field'];
-        else if($this->enabled === true)
+        } elseif ($this->enabled === true) {
             throw new \Exception("Missing required property 'field'");
+        }
 
         $this->through = (isset($options['through'])) ? $options['through']:null;
     }
@@ -64,3 +66,4 @@ class SecuredPath
         return $this->enabled;
     }
 }
+

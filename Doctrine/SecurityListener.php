@@ -1,6 +1,6 @@
 <?php
+
 namespace NS\SecurityBundle\Doctrine;
-use Doctrine\Common\EventArgs;
 
 class SecurityListener
 {

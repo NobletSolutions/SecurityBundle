@@ -31,3 +31,4 @@ class Manager extends EntityManagerDecorator implements ContainerAwareInterface
         $this->container = $container;
     }
 }
+
