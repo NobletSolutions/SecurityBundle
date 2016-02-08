@@ -3,7 +3,7 @@
 namespace NS\SecurityBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * NS\SecurityBundle\Entity
