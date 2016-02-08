@@ -3,6 +3,7 @@ VERSION 4  MINOR REFACTOR, UPDATED MINIMUM SYMFONY VERSION TO 2.7
 =================================================================
 
    Version 4.0 - Minor refactor, updated minimum symfony version to 2.7
+      08/02/2016 16:35  4.0.2  Remove deprecated classes
       08/02/2016 16:02  4.0.1  Various fixes
       08/02/2016 15:56  4.0.0  initial release
 
