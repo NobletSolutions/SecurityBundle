@@ -3,6 +3,7 @@
 namespace NS\SecurityBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * NS\SecurityBundle\Entity
@@ -29,6 +30,7 @@ class BaseACL implements \Serializable
      * @var integer $object_id
      * 
      * @ORM\Column(name="object_id",type="integer",nullable=true)
+     * @Assert\NotBlank()
      */    
     protected $object_id;
     
