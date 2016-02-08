@@ -9,6 +9,9 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLogin
  
 class AdminFactory extends FormLoginFactory
 {
+    /**
+     * AdminFactory constructor.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -16,16 +19,29 @@ class AdminFactory extends FormLoginFactory
         $this->addOption('user_parameter', '_user');
     }
 
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return 'admin-login';
     }
- 
+
+    /**
+     * @return string
+     */
     protected function getListenerId()
     {
         return 'ns.security.authentication.listener';
     }
- 
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string $id
+     * @param array $config
+     * @param string $userProviderId
+     * @return string
+     */
     protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
     {
         $provider = 'security.authentication_provider.ns_security_'.$id;
