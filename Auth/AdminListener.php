@@ -1,6 +1,7 @@
 <?php
 namespace NS\SecurityBundle\Auth;
 
+use Symfony\Component\Security\Http\Firewall\AbstractAuthenticationListener;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
@@ -70,8 +71,6 @@ class AdminListener extends AbstractAuthenticationListener
         if (null !== $user) {
             $token->setAttribute('desired_user', $user);
         }
-
-        $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
 
         return $this->authenticationManager->authenticate($token);
     }
