@@ -2,6 +2,7 @@
 
 namespace NS\SecurityBundle\Role;
 
+use NS\SecurityBundle\Entity\BaseACL;
 use \Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use \Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
@@ -12,6 +13,9 @@ use \Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 class ACLConverter
 {
+    /**
+     * @var RoleHierarchyInterface
+     */
     private $rHierarchy;
 
     /**
@@ -26,7 +30,7 @@ class ACLConverter
     /**
      *
      * @param TokenInterface $token - Array of ACL objects to check
-     * @param string $inputRole           - Requested Role
+     * @param string $inputRole     - Requested Role
      * 
      * @return array
      */
@@ -47,14 +51,14 @@ class ACLConverter
 
     /**
      *
-     * @param ACL $acl
+     * @param BaseACL $acl
      * @param array $reachable
      * @return boolean
      */
-    protected function findInMap($acl, $reachable)
+    protected function findInMap(BaseACL $acl, array $reachable)
     {
-        foreach($reachable as $role) {
-            if($acl->getType()->equal($role->getRole())) {
+        foreach ($reachable as $role) {
+            if ($acl->getType()->equal($role->getRole())) {
                 return true;
             }
         }

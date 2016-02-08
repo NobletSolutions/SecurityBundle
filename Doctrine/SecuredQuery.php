@@ -4,7 +4,10 @@ namespace NS\SecurityBundle\Doctrine;
 
 use \Doctrine\Common\Annotations\AnnotationReader;
 use \Doctrine\ORM\QueryBuilder;
+use NS\SecurityBundle\Annotation\SecuredCondition;
 use \NS\SecurityBundle\Role\ACLConverter;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use \Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
@@ -14,21 +17,18 @@ use \Symfony\Component\Security\Core\SecurityContextInterface;
  */
 class SecuredQuery
 {
-    private $securityContext;
+    private $tokenStorage;
+    private $authChecker;
     private $queryBuilder;
     private $aclRetriever;
 
     private static $aliasCount = 30;
 
-    /**
-     *
-     * @param SecurityContextInterface $securityContext
-     * @param ACLConverter $aclRetriever
-     */
-    public function __construct(SecurityContextInterface $securityContext, ACLConverter $aclRetriever)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authChecker, ACLConverter $aclRetriever)
     {
-        $this->securityContext = $securityContext;
-        $this->aclRetriever    = $aclRetriever;
+        $this->tokenStorage = $tokenStorage;
+        $this->authChecker  = $authChecker;
+        $this->aclRetriever = $aclRetriever;
     }
 
     /**
@@ -40,7 +40,7 @@ class SecuredQuery
      */
     public function secure(QueryBuilder $query)
     {
-        if(!$this->securityContext || !$this->securityContext->getToken()) {
+        if (!$this->tokenStorage->getToken()) {
             return $query;
         }
 
@@ -51,55 +51,54 @@ class SecuredQuery
         $securedObject      = $reader->getClassAnnotation(new \ReflectionClass($class),'NS\SecurityBundle\Annotation\Secured');
 
         // this object isn't secured
-        if(!$securedObject){
+        if (!$securedObject) {
             return $query;
         }
 
-        $alias   = $from[0]->getAlias();
+        $alias = $from[0]->getAlias();
         $aliases = array($alias);
 
-        list($role,$condition) = $this->getRole($securedObject);
+        list($role, $condition) = $this->getRole($securedObject);
 
-        if($role !== false) // have a role
-        {
-            if(!$condition->isEnabled()) {
+        // have a role
+        if ($role !== false) {
+            if (!$condition->isEnabled()) {
                 return $query;
             }
 
-            $ids = $this->aclRetriever->getObjectIdsForRole($this->securityContext->getToken(), $role);
+            $ids = $this->aclRetriever->getObjectIdsForRole($this->tokenStorage->getToken(), $role);
 
-            if(count($ids) == 0){
-                throw new \RuntimeException('This user has no configured acls for role '.$role);
+            if (count($ids) == 0) {
+                throw new \RuntimeException('This user has no configured acls for role ' . $role);
             }
 
-            if($condition->hasThrough()){
+            if ($condition->hasThrough()) {
                 $this->handleThrough($condition, $alias, $aliases);
             }
 
-            if($condition->hasField()){
+            if ($condition->hasField()) {
                 $this->handleField($condition, $ids, $aliases);
-            }
-            else if($condition->hasRelation()) {
+            } elseif ($condition->hasRelation()) {
                 $this->handleRelation($condition, $ids, $aliases);
-            }
-            else {
+            } else {
                 throw new \InvalidArgumentException("The condition has neither fields nor classes - this should never be thrown");
             }
-        }
-        else {
+        } else {
             throw new \RuntimeException("This user has no roles");
         }
 
         return $this->queryBuilder;
     }
 
+    /**
+     * @param $securedObject
+     * @return array
+     */
     protected function getRole($securedObject)
     {
-        foreach($securedObject->getConditions() as $condition)
-        {
-            foreach($condition->getRoles() as $val)
-            {
-                if($this->securityContext->isGranted($val)) {
+        foreach($securedObject->getConditions() as $condition) {
+            foreach($condition->getRoles() as $val) {
+                if($this->authChecker->isGranted($val)) {
                     return array($val,$condition);
                 }
             }
@@ -108,66 +107,83 @@ class SecuredQuery
         return array(false,null);
     }
 
-    protected function handleRelation($cond, array $ids, array &$aliases)
+    /**
+     * @param SecuredQuery $cond
+     * @param array $ids
+     * @param array $aliases
+     */
+    protected function handleRelation(SecuredQuery $cond, array $ids, array &$aliases)
     {
         $em = $this->queryBuilder->getEntityManager();
-        if(count($ids) == 1) {
-            $ref = $em->getReference($cond->getClass(),current($ids));
+        if (count($ids) == 1) {
+            $ref = $em->getReference($cond->getClass(), current($ids));
             $key = $this->getKey($cond, $aliases);
             $this->queryBuilder
-                 ->andWhere(sprintf('(%s.%s = %s)',end($aliases),$cond->getRelation(),$key))
-                 ->setParameter($key,$ref);
-        }
-        else {
+                ->andWhere(sprintf('(%s.%s = %s)', end($aliases), $cond->getRelation(), $key))
+                ->setParameter($key, $ref);
+        } else {
             $where = array();
-            foreach($ids as &$id) {
-                $ref     = $em->getReference($cond->getClass(),$id);
-                $key     = $this->getKey($cond, $aliases);
-                $where[] = sprintf('(%s.%s = %s)',end($aliases),$cond->getRelation(),$key);
-                $this->queryBuilder->setParameter($key,$ref);
+            foreach ($ids as &$id) {
+                $ref = $em->getReference($cond->getClass(), $id);
+                $key = $this->getKey($cond, $aliases);
+                $where[] = sprintf('(%s.%s = %s)', end($aliases), $cond->getRelation(), $key);
+                $this->queryBuilder->setParameter($key, $ref);
             }
 
-            if(count($where) != count($ids)) {
+            if (count($where) != count($ids)) {
                 throw new \RuntimeException("We don't have as many where's as ids!");
             }
 
-            $this->queryBuilder->andWhere( '('.implode(" OR ", $where).')');
+            $this->queryBuilder->andWhere('(' . implode(" OR ", $where) . ')');
         }
     }
 
-    protected function handleField($cond, array $ids, array &$aliases)
+    /**
+     * @param SecuredCondition $cond
+     * @param array $ids
+     * @param array $aliases
+     */
+    protected function handleField(SecuredCondition $cond, array $ids, array &$aliases)
     {
-        if(count($ids) > 1){
-            $this->queryBuilder->andWhere($this->queryBuilder->expr()->in(end($aliases).'.'.$cond->getField(),$ids));
-        }
-        elseif(count($ids) == 1) {
+        if (count($ids) > 1) {
+            $this->queryBuilder->andWhere($this->queryBuilder->expr()->in(end($aliases) . '.' . $cond->getField(), $ids));
+        } elseif (count($ids) == 1) {
             $key = $this->getKey($cond, $aliases);
             $this->queryBuilder
-                 ->andWhere(sprintf('(%s.%s = %s)',end($aliases),$cond->getField(),$key))
-                 ->setParameter($key,current($ids));
+                ->andWhere(sprintf('(%s.%s = %s)', end($aliases), $cond->getField(), $key))
+                ->setParameter($key, current($ids));
         }
     }
 
-    protected function getKey($condition,array $aliases)
+    /**
+     * @param $condition
+     * @param array $aliases
+     * @return string
+     */
+    protected function getKey($condition, array $aliases)
     {
         static $_key = 49;
 
         return sprintf(":%s%s%s",end($aliases),$condition->getField(),$_key++);
     }
 
-    protected function handleThrough($cond, $alias, array &$aliases)
+    /**
+     * @param SecuredCondition $cond
+     * @param $alias
+     * @param array $aliases
+     */
+    protected function handleThrough(SecuredCondition $cond, $alias, array &$aliases)
     {
         $joins = $this->queryBuilder->getDQLPart('join');
 
-        foreach($cond->getThrough() as $association)
-        {
+        foreach($cond->getThrough() as $association) {
             $found = false;
 
-            if(isset($joins[$alias])) {
+            if (isset($joins[$alias])) {
                 $found = $this->findJoin($joins, $alias, $association, $aliases);
             }
 
-            if(!$found) {
+            if (!$found) {
                 $newalias = strtolower(substr($association,0,3)).self::$aliasCount++;
                 $this->queryBuilder->leftJoin(end($aliases).'.'.$association, $newalias);
                 $aliases[] = $newalias;
@@ -175,10 +191,17 @@ class SecuredQuery
         }
     }
 
+    /**
+     * @param array $joins
+     * @param $alias
+     * @param $association
+     * @param array $aliases
+     * @return bool
+     */
     protected function findJoin(array $joins, $alias, $association, array &$aliases)
     {
         foreach($joins[$alias] as $join) {
-            if($join->getJoin() == "$alias.$association") {
+            if ($join->getJoin() == "$alias.$association") {
                 $aliases[] = $join->getAlias();
                 return true;
             }

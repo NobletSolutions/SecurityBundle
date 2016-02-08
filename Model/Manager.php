@@ -3,13 +3,21 @@
 namespace NS\SecurityBundle\Model;
 
 use \Doctrine\ORM\Decorator\EntityManagerDecorator;
-use \NS\SecurityBundle\Model\SecuredRepositoryInterface;
-use \Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use \Symfony\Component\DependencyInjection\ContainerInterface;
+use NS\SecurityBundle\Doctrine\SecuredQuery;
 
-class Manager extends EntityManagerDecorator implements ContainerAwareInterface
+class Manager extends EntityManagerDecorator
 {
-    private $container;
+    private $securedQuery;
+
+    /**
+     * @param mixed $securedQuery
+     * @return Manager
+     */
+    public function setSecuredQuery(SecuredQuery $securedQuery)
+    {
+        $this->securedQuery = $securedQuery;
+        return $this;
+    }
 
     /**
      * {@inheritdoc}
@@ -17,18 +25,12 @@ class Manager extends EntityManagerDecorator implements ContainerAwareInterface
     public function getRepository($class)
     {
         $repo = $this->wrapped->getRepository($class);
-        if ($repo && $repo instanceof SecuredRepositoryInterface)
-        {
-            $repo->setSecurityContext($this->container->get('security.context'));
-            $repo->setSecuredQuery($this->container->get('ns.security.query'));
+
+        if ($repo && $repo instanceof SecuredRepositoryInterface) {
+            $repo->setSecuredQuery($this->securedQuery);
         }
 
         return $repo;
-    }
-
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
     }
 }
 

@@ -1,6 +1,7 @@
 <?php
 
 namespace NS\SecurityBundle\Model;
+use NS\SecurityBundle\Doctrine\SecuredQuery;
 
 /**
  *
@@ -8,6 +9,5 @@ namespace NS\SecurityBundle\Model;
  */
 interface SecuredRepositoryInterface
 {
-    public function setSecurityContext($security);
-    public function setSecuredQuery($qb);
+    public function setSecuredQuery(SecuredQuery $qb);
 }

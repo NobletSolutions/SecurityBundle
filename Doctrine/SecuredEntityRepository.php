@@ -13,43 +13,30 @@ use Doctrine\ORM\QueryBuilder;
  */
 class SecuredEntityRepository extends EntityRepository implements SecuredRepositoryInterface
 {
-    private $_security;
-    private $_queryBuilder;
-    private $_manager;
+    private $queryBuilder;
+    private $manager;
     
-    public function setSecurityContext($security)
+    public function setSecuredQuery(SecuredQuery $qb)
     {
-        $this->_security = $security;
-
-        return $this;
-    }
-
-    public function getSecurityContext()
-    {
-        return $this->_security;
-    }
-
-    public function setSecuredQuery($qb)
-    {
-        $this->_queryBuilder = $qb;
+        $this->queryBuilder = $qb;
 
         return $this;
     }
 
     public function getSecuredQuery()
     {
-        return $this->_queryBuilder;
+        return $this->queryBuilder;
     }
 
     public function hasSecuredQuery()
     {
-        return $this->_queryBuilder !== null;
+        return $this->queryBuilder !== null;
     }
 
     public function secure(QueryBuilder $qb)
     {
-        if ($this->_queryBuilder) {
-            return $this->_queryBuilder->secure($qb);
+        if ($this->queryBuilder) {
+            return $this->queryBuilder->secure($qb);
         }
 
         throw new \RuntimeException("Calling secure on a non-object");
@@ -57,13 +44,13 @@ class SecuredEntityRepository extends EntityRepository implements SecuredReposit
 
     public function setManager($manager)
     {
-        $this->_manager = $manager;
+        $this->manager = $manager;
 
         return $this;
     }
 
     public function getManager()
     {
-        return $this->_manager;
+        return $this->manager;
     }
 }

@@ -2,8 +2,7 @@
 
 namespace NS\SecurityBundle\Doctrine;
 
-interface Security
+interface SecurityInterface
 {
 
 }
-
