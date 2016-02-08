@@ -4,11 +4,11 @@ namespace NS\SecurityBundle\Doctrine;
 
 use \Doctrine\Common\Annotations\AnnotationReader;
 use \Doctrine\ORM\QueryBuilder;
+use NS\SecurityBundle\Annotation\Secured;
 use NS\SecurityBundle\Annotation\SecuredCondition;
 use \NS\SecurityBundle\Role\ACLConverter;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use \Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * Description of SecuredQuery
@@ -91,10 +91,10 @@ class SecuredQuery
     }
 
     /**
-     * @param $securedObject
+     * @param Secured $securedObject
      * @return array
      */
-    protected function getRole($securedObject)
+    protected function getRole(Secured $securedObject)
     {
         foreach($securedObject->getConditions() as $condition) {
             foreach($condition->getRoles() as $val) {
@@ -156,11 +156,11 @@ class SecuredQuery
     }
 
     /**
-     * @param $condition
+     * @param SecuredCondition $condition
      * @param array $aliases
      * @return string
      */
-    protected function getKey($condition, array $aliases)
+    protected function getKey(SecuredCondition $condition, array $aliases)
     {
         static $_key = 49;
 
