@@ -71,7 +71,7 @@ class BaseACL implements \Serializable
      * Set user_id
      *
      * @param integer $userId
-     * @return UserDivision
+     * @return BaseACL
      */
     public function setUserId($userId)
     {
@@ -94,7 +94,7 @@ class BaseACL implements \Serializable
      * Set object_id
      *
      * @param integer $objectId
-     * @return ACL
+     * @return BaseACL
      */
     public function setObjectId($objectId)
     {
@@ -117,7 +117,7 @@ class BaseACL implements \Serializable
      * Set type
      *
      * @param integer $type
-     * @return ACL
+     * @return BaseACL
      */
     public function setType($type)
     {
@@ -140,7 +140,7 @@ class BaseACL implements \Serializable
      * Set valid_from
      *
      * @param \DateTime $validFrom
-     * @return ACL
+     * @return BaseACL
      */
     public function setValidFrom(\DateTime $validFrom = null)
     {
@@ -163,7 +163,7 @@ class BaseACL implements \Serializable
      * Set valid_to
      *
      * @param \DateTime $validTo
-     * @return ACL
+     * @return BaseACL
      */
     public function setValidTo(\DateTime $validTo = null)
     {
