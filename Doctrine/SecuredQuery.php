@@ -2,11 +2,11 @@
 
 namespace NS\SecurityBundle\Doctrine;
 
-use \Doctrine\Common\Annotations\AnnotationReader;
-use \Doctrine\ORM\QueryBuilder;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\QueryBuilder;
 use NS\SecurityBundle\Annotation\Secured;
 use NS\SecurityBundle\Annotation\SecuredCondition;
-use \NS\SecurityBundle\Role\ACLConverter;
+use NS\SecurityBundle\Role\ACLConverter;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -108,11 +108,11 @@ class SecuredQuery
     }
 
     /**
-     * @param SecuredQuery $cond
+     * @param SecuredCondition $cond
      * @param array $ids
      * @param array $aliases
      */
-    protected function handleRelation(SecuredQuery $cond, array $ids, array &$aliases)
+    protected function handleRelation(SecuredCondition $cond, array $ids, array &$aliases)
     {
         $em = $this->queryBuilder->getEntityManager();
         if (count($ids) == 1) {
