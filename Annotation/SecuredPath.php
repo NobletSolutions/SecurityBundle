@@ -2,7 +2,6 @@
 
 namespace NS\SecurityBundle\Annotation;
 
-
 /**
  * Description of SecuredPath
  * @Annotation
@@ -66,4 +65,3 @@ class SecuredPath
         return $this->enabled;
     }
 }
-

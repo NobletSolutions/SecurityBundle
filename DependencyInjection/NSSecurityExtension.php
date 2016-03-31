@@ -23,4 +23,3 @@ class NSSecurityExtension extends Extension
         $loader->load('services.yml');
     }
 }
-

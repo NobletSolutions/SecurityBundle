@@ -48,7 +48,7 @@ class SecuredQuery
         $from               = $this->queryBuilder->getDQLPart('from');
         $class              = $from[0]->getFrom();
         $reader             = new AnnotationReader();
-        $securedObject      = $reader->getClassAnnotation(new \ReflectionClass($class),'NS\SecurityBundle\Annotation\Secured');
+        $securedObject      = $reader->getClassAnnotation(new \ReflectionClass($class), 'NS\SecurityBundle\Annotation\Secured');
 
         // this object isn't secured
         if (!$securedObject) {
@@ -96,9 +96,9 @@ class SecuredQuery
      */
     protected function getRole(Secured $securedObject)
     {
-        foreach($securedObject->getConditions() as $condition) {
-            foreach($condition->getRoles() as $val) {
-                if($this->authChecker->isGranted($val)) {
+        foreach ($securedObject->getConditions() as $condition) {
+            foreach ($condition->getRoles() as $val) {
+                if ($this->authChecker->isGranted($val)) {
                     return array($val,$condition);
                 }
             }
@@ -164,7 +164,7 @@ class SecuredQuery
     {
         static $_key = 49;
 
-        return sprintf(":%s%s%s",end($aliases),$condition->getField(),$_key++);
+        return sprintf(":%s%s%s", end($aliases), $condition->getField(), $_key++);
     }
 
     /**
@@ -176,7 +176,7 @@ class SecuredQuery
     {
         $joins = $this->queryBuilder->getDQLPart('join');
 
-        foreach($cond->getThrough() as $association) {
+        foreach ($cond->getThrough() as $association) {
             $found = false;
 
             if (isset($joins[$alias])) {
@@ -184,7 +184,7 @@ class SecuredQuery
             }
 
             if (!$found) {
-                $newalias = strtolower(substr($association,0,3)).self::$aliasCount++;
+                $newalias = strtolower(substr($association, 0, 3)).self::$aliasCount++;
                 $this->queryBuilder->leftJoin(end($aliases).'.'.$association, $newalias);
                 $aliases[] = $newalias;
             }
@@ -200,7 +200,7 @@ class SecuredQuery
      */
     protected function findJoin(array $joins, $alias, $association, array &$aliases)
     {
-        foreach($joins[$alias] as $join) {
+        foreach ($joins[$alias] as $join) {
             if ($join->getJoin() == "$alias.$association") {
                 $aliases[] = $join->getAlias();
                 return true;

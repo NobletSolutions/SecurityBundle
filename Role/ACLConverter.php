@@ -39,7 +39,7 @@ class ACLConverter
         $object_ids = array();
         $reachable  = $this->getRoleHierarchy()->getReachableRoles($token->getRoles());
 
-        foreach($token->getUser()->getAcls() as $acl) {
+        foreach ($token->getUser()->getAcls() as $acl) {
             // found an object id for this role
             if ($acl->getType()->equal($inputRole) || $this->findInMap($acl, $reachable)) {
                 $object_ids[] = $acl->getObjectId();

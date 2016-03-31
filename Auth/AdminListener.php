@@ -75,4 +75,3 @@ class AdminListener extends AbstractAuthenticationListener
         return $this->authenticationManager->authenticate($token);
     }
 }
-

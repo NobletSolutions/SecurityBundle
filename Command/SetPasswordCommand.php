@@ -47,21 +47,21 @@ class SetPasswordCommand extends ContainerAwareCommand
         $em      = $this->getContainer()->get('doctrine')->getEntityManager();
 
         try {
-            $user    = $em->createQueryBuilder()->select('u')->from($class,'u')->where('u.'.$ufield.' = :email')->setParameter('email',$u_email)->getQuery()->getSingleResult();
+            $user    = $em->createQueryBuilder()->select('u')->from($class, 'u')->where('u.'.$ufield.' = :email')->setParameter('email', $u_email)->getQuery()->getSingleResult();
             $factory = $this->getContainer()->get('security.encoder_factory');
             $encoder = $factory->getEncoder($user);
 
-	    if($user instanceof UserInterface) {
+            if ($user instanceof UserInterface) {
                 $output->writeln("User: ".$user->getUsername());
-            } elseif(method_exists($user,'__toString')) {
+            } elseif (method_exists($user, '__toString')) {
                 $output->writeln("User: $user");
             }
 
-            if(method_exists($user, 'resetSalt')) {
+            if (method_exists($user, 'resetSalt')) {
                 $user->resetSalt();
             }
 
-            $user->setPassword($encoder->encodePassword($newpass,$user->getSalt()));
+            $user->setPassword($encoder->encodePassword($newpass, $user->getSalt()));
             $em->persist($user);
             $em->flush();
 
@@ -75,4 +75,3 @@ class SetPasswordCommand extends ContainerAwareCommand
         $output->writeln(sprintf('Done'));
     }
 }
-

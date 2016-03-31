@@ -1,6 +1,7 @@
 <?php
 
 namespace NS\SecurityBundle\Annotation;
+
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**

@@ -163,4 +163,3 @@ class AdminAuthenticationProvider extends UserAuthenticationProvider
         }
     }
 }
-

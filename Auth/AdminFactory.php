@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory;
- 
+
 class AdminFactory extends FormLoginFactory
 {
     /**
@@ -53,4 +53,3 @@ class AdminFactory extends FormLoginFactory
         return $provider;
     }
 }
-

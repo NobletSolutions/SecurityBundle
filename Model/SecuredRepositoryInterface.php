@@ -1,6 +1,7 @@
 <?php
 
 namespace NS\SecurityBundle\Model;
+
 use NS\SecurityBundle\Doctrine\SecuredQuery;
 
 /**

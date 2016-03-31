@@ -31,14 +31,14 @@ class BaseACL implements \Serializable
      * 
      * @ORM\Column(name="object_id",type="integer",nullable=true)
      * @Assert\NotBlank()
-     */    
+     */
     protected $object_id;
     
     /**
      * @var integer $type
      * 
      * @ORM\Column(name="type",type="integer")
-     */    
+     */
     protected $type;
 
     /**
@@ -50,7 +50,7 @@ class BaseACL implements \Serializable
     /**
      * @var DateTime $valid_to
      * @ORM\Column(name="valid_to",type="datetime",nullable=true)
-     */    
+     */
     protected $valid_to;
 
     /**
@@ -204,7 +204,7 @@ class BaseACL implements \Serializable
      */
     public function unserialize($serialized)
     {
-        list (
+        list(
             $this->id,
             $this->user_id,
             $this->object_id,

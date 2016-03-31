@@ -14,10 +14,11 @@ class Secured
 
     public function __construct($options)
     {
-        if(isset($options['conditions']))
+        if (isset($options['conditions'])) {
             $this->conditions = $options['conditions'];
-        else
+        } else {
             throw new \Exception("Missing required property 'conditions'");
+        }
     }
  
     public function getConditions()

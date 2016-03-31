@@ -33,4 +33,3 @@ class Manager extends EntityManagerDecorator
         return $repo;
     }
 }
-
