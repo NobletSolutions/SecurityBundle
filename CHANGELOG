@@ -2,6 +2,9 @@
 VERSION 4  MINOR REFACTOR, UPDATED MINIMUM SYMFONY VERSION TO 2.7
 =================================================================
 
+   Version 4.2 - Lazy secured.query
+      31/03/2016 21:56  4.2.0  initial release
+
    Version 4.1 - Added the ACL Autocompleter
       31/03/2016 21:27  4.1.0  initial release
 
