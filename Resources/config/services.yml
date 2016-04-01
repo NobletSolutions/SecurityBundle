@@ -1,7 +1,3 @@
-parameters:
-    ns.security.query.class: NS\SecurityBundle\Doctrine\SecuredQuery
-    ns.security.acl_converter.class: NS\SecurityBundle\Role\ACLConverter
-
 services:
   ns_security.acl_autocompleter:
     class: NS\SecurityBundle\Form\Types\ACLAutoCompleterType
@@ -9,21 +5,22 @@ services:
     tags:
       - { name: form.type, alias: acl_object_target_autocompleter }
 
-  ns.security.acl_converter:
-    class: %ns.security.acl_converter.class%
+  ns_security.acl_converter:
+    class: NS\SecurityBundle\Role\ACLConverter
     arguments: [ "@security.role_hierarchy" ]
 
-  ns.security.query:
-    class: %ns.security.query.class%
-    arguments: [ "@security.token_storage", "@security.authorization_checker", "@ns.security.acl_converter" ]
+  ns_security.query:
+    class: NS\SecurityBundle\Doctrine\SecuredQuery
+    arguments: [ "@security.token_storage", "@security.authorization_checker", "@ns_security.acl_converter" ]
+    lazy: true
 
-  ns.model_manager:
+  ns_security.model_manager:
       public: false
       class: NS\SecurityBundle\Model\Manager
       decorates: doctrine.orm.default_entity_manager
-      arguments: [ "@ns.model_manager.inner" ]
+      arguments: [ "@ns_security.model_manager.inner" ]
       calls:
-        - [ setSecuredQuery, [ "@ns.security.query" ] ]
+        - [ setSecuredQuery, [ "@ns_security.query" ] ]
 
   ns.security.authentication.listener:
     class: NS\SecurityBundle\Auth\AdminListener
@@ -34,4 +31,5 @@ services:
     class: NS\SecurityBundle\Auth\AdminAuthenticationProvider
     abstract: true
     public: false
-    arguments: [ '', "@security.user_checker", '', "@security.encoder_factory", %security.authentication.hide_user_not_found% ]
+    arguments: [ '', "@security.user_checker", '', "@security.encoder_factory", "%security.authentication.hide_user_not_found%" ]
+
