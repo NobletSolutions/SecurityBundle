@@ -3,6 +3,12 @@ parameters:
     ns.security.acl_converter.class: NS\SecurityBundle\Role\ACLConverter
 
 services:
+  ns_security.acl_autocompleter:
+    class: NS\SecurityBundle\Form\Types\ACLAutoCompleterType
+    arguments: [ "@doctrine.orm.entity_manager" ]
+    tags:
+      - { name: form.type, alias: acl_object_target_autocompleter }
+
   ns.security.acl_converter:
     class: %ns.security.acl_converter.class%
     arguments: [ "@security.role_hierarchy" ]
