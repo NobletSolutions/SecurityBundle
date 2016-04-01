@@ -63,25 +63,15 @@ class ObjectIdToTargetEntity implements DataTransformerInterface
 
     /**
      * @inheritDoc
+     *
+     * Because this transformer is used strictly for the ACL object_id form field
+     * We know that the object_id is a field that is a lose PK to other tables.
+     * As such no reverse transformation is required since the autocomplete form field
+     * is handled by JS and that submits only the ID of the {'id': X, 'name': 'name'} that is
+     * in the input field.
      */
     public function reverseTransform($value)
     {
-        if ('' === $value || null === $value) {
-            return null;
-        }
-
-        if (!is_string($value)) {
-            throw new UnexpectedTypeException($value, 'string');
-        }
-
-        $idsArray = json_decode($value, true);
-
-        if (empty($idsArray)) {
-            return null;
-        } elseif (count($idsArray) > 1) {
-            throw new \Exception('Too many ids');
-        }
-
-        return key($idsArray);
+        return $value;
     }
 }
