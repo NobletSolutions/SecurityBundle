@@ -2,6 +2,9 @@
 VERSION 4  MINOR REFACTOR, UPDATED MINIMUM SYMFONY VERSION TO 2.7
 =================================================================
 
+   Version 4.1 - Added the ACL Autocompleter
+      31/03/2016 21:27  4.1.0  initial release
+
    Version 4.0 - Minor refactor, updated minimum symfony version to 2.7
       09/02/2016 12:10  4.0.4  Fix bad typehint
       08/02/2016 16:38  4.0.3  Fix missing use statements
