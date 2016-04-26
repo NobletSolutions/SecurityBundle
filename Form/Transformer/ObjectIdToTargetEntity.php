@@ -48,12 +48,15 @@ class ObjectIdToTargetEntity implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (null === $value) {
+        if (null === $value || empty($value)) {
             return json_encode(array());
         }
 
         if (is_object($this->acl) && method_exists($this->acl, 'getType')) {
             $entity = $this->entityMgr->getRepository($this->acl->getType()->getClassMatch())->find($value);
+            if (!$entity) {
+                return json_encode(array());
+            }
         } else {
             throw new TransformationFailedException("Unable to transform $value to any acl role type");
         }
