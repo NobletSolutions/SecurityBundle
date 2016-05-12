@@ -11,4 +11,6 @@ use NS\SecurityBundle\Doctrine\SecuredQuery;
 interface SecuredRepositoryInterface
 {
     public function setSecuredQuery(SecuredQuery $qb);
+
+    public function createSecuredQueryBuilder($alias);
 }
