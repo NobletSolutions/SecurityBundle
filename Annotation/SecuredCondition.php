@@ -65,8 +65,10 @@ class SecuredCondition
             $this->enabled = (bool)$options['enabled'];
         }
 
-        if ($this->enabled === true && !isset($options['field']) && (!isset($options['relation']) || !isset($options['class']))) {
-            throw new MissingOptionsException("Missing required property 'field' or 'relation' and 'class'",$options);
+        if ($this->enabled === true ) {
+            if(!isset($options['field']) || (!isset($options['relation']) && !isset($options['class']))) {
+                throw new MissingOptionsException("Missing required property 'field' or 'relation' and 'class'", $options);
+            }
         }
 
         if (isset($options['field'])) {
