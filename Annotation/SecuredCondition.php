@@ -66,17 +66,17 @@ class SecuredCondition
         }
 
         if ($this->enabled === true ) {
-            if(!isset($options['field']) || (!isset($options['relation']) && !isset($options['class']))) {
-                throw new MissingOptionsException("Missing required property 'field' or 'relation' and 'class'", $options);
+            if (isset($options['field'])) {
+                $this->field = $options['field'];
+            } else {
+                if(!isset($options['relation']) || !isset($options['class'])) {
+                    throw new MissingOptionsException("Missing required property 'field' or 'relation' and 'class'", $options);
+                }
+                $this->class = $options['class'];
+                $this->relation = $options['relation'];
             }
         }
 
-        if (isset($options['field'])) {
-            $this->field = $options['field'];
-        } else {
-            $this->class = $options['class'];
-            $this->relation = $options['relation'];
-        }
     }
 
     /**

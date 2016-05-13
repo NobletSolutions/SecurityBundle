@@ -32,11 +32,9 @@ class SecuredConditionTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array('through' => 'something')),
-            array(array('roles'=>array('ROLE_ONE'))),
-            array(array('roles'=>array('ROLE_ONE'),'field'=>'something')),
-            array(array('roles'=>array('ROLE_ONE'),'relation'=>'something')),
-            array(array('roles'=>array('ROLE_ONE'),'class'=>'something')),
-
+            array(array('roles' => array('ROLE_ONE'))),
+            array(array('roles' => array('ROLE_ONE'), 'relation' => 'relation')),
+            array(array('roles' => array('ROLE_ONE'), 'class' => 'class')),
         );
     }
 }
