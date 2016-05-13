@@ -3,6 +3,7 @@ VERSION 4  MINOR REFACTOR, UPDATED MINIMUM SYMFONY VERSION TO 2.7
 =================================================================
 
    Version 4.2 - Lazy secured.query
+      13/05/2016 10:14  4.2.5  Fix options
       12/05/2016 23:28  4.2.4  Various cleanups/documentation
       12/05/2016 17:16  4.2.3  New createSecuredQueryBuilder method
       26/04/2016 10:20  4.2.2  Handle empty transformation values
