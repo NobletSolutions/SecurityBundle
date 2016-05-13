@@ -22,7 +22,7 @@ class SecuredCondition
     private $through;
 
     /**
-     * @var null
+     * @var string|null
      */
     private $field    = null;
 
@@ -32,12 +32,12 @@ class SecuredCondition
     private $enabled  = true;
 
     /**
-     * @var null
+     * @var string|null
      */
     private $class    = null;
 
     /**
-     * @var null
+     * @var string|null
      */
     private $relation = null;
 
@@ -96,7 +96,7 @@ class SecuredCondition
     }
 
     /**
-     * @return null
+     * @return string|null
      */
     public function getField()
     {
@@ -129,16 +129,6 @@ class SecuredCondition
     }
 
     /**
-     * @param $enabled
-     * @return $this
-     */
-    public function setEnabled($enabled)
-    {
-        $this->enabled = $enabled;
-        return $this;
-    }
-
-    /**
      * @return bool
      */
     public function getEnabled()
@@ -147,7 +137,7 @@ class SecuredCondition
     }
 
     /**
-     * @return null
+     * @return string|null
      */
     public function getClass()
     {
@@ -155,31 +145,11 @@ class SecuredCondition
     }
 
     /**
-     * @param $class
-     * @return $this
-     */
-    public function setClass($class)
-    {
-        $this->class = $class;
-        return $this;
-    }
-
-    /**
-     * @return null
+     * @return string|null
      */
     public function getRelation()
     {
         return $this->relation;
-    }
-
-    /**
-     * @param $relation
-     * @return $this
-     */
-    public function setRelation($relation)
-    {
-        $this->relation = $relation;
-        return $this;
     }
 
     /**

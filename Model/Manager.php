@@ -7,10 +7,13 @@ use NS\SecurityBundle\Doctrine\SecuredQuery;
 
 class Manager extends EntityManagerDecorator
 {
+    /**
+     * @var SecuredQuery
+     */
     private $securedQuery;
 
     /**
-     * @param mixed $securedQuery
+     * @param SecuredQuery $securedQuery
      * @return Manager
      */
     public function setSecuredQuery(SecuredQuery $securedQuery)

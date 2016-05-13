@@ -58,6 +58,7 @@ class SecuredQuery
         $alias = $from[0]->getAlias();
         $aliases = array($alias);
 
+        /** @var SecuredCondition $condition */
         list($role, $condition) = $this->getRole($securedObject);
 
         // have a role
@@ -80,8 +81,6 @@ class SecuredQuery
                 $this->handleField($condition, $ids, $aliases);
             } elseif ($condition->hasRelation()) {
                 $this->handleRelation($condition, $ids, $aliases);
-            } else {
-                throw new \InvalidArgumentException("The condition has neither fields nor classes - this should never be thrown");
             }
         } else {
             throw new \RuntimeException("This user has no roles");

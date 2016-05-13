@@ -13,9 +13,15 @@ use Doctrine\ORM\QueryBuilder;
  */
 class SecuredEntityRepository extends EntityRepository implements SecuredRepositoryInterface
 {
+    /**
+     * @var SecuredQuery
+     */
     private $queryBuilder;
-    private $manager;
-    
+
+    /**
+     * @param SecuredQuery $qb
+     * @return $this
+     */
     public function setSecuredQuery(SecuredQuery $qb)
     {
         $this->queryBuilder = $qb;
@@ -23,16 +29,26 @@ class SecuredEntityRepository extends EntityRepository implements SecuredReposit
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSecuredQuery()
     {
         return $this->queryBuilder;
     }
 
+    /**
+     * @return bool
+     */
     public function hasSecuredQuery()
     {
         return $this->queryBuilder !== null;
     }
 
+    /**
+     * @param QueryBuilder $qb
+     * @return mixed
+     */
     public function secure(QueryBuilder $qb)
     {
         if ($this->queryBuilder) {
@@ -42,18 +58,10 @@ class SecuredEntityRepository extends EntityRepository implements SecuredReposit
         throw new \RuntimeException("Calling secure on a non-object");
     }
 
-    public function setManager($manager)
-    {
-        $this->manager = $manager;
-
-        return $this;
-    }
-
-    public function getManager()
-    {
-        return $this->manager;
-    }
-
+    /**
+     * @param $alias
+     * @return mixed
+     */
     public function createSecuredQueryBuilder($alias)
     {
         return $this->secure($this->createQueryBuilder($alias));
