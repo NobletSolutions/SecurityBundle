@@ -43,9 +43,9 @@ class SecuredCondition
 
     /**
      * SecuredCondition constructor.
-     * @param $options
+     * @param array $options
      */
-    public function __construct($options)
+    public function __construct(array $options)
     {
         if (isset($options['through'])) {
             if (!is_array($options['through'])) {
@@ -58,7 +58,7 @@ class SecuredCondition
         if (isset($options['roles'])) {
             $this->roles = (is_array($options['roles'])) ? $options['roles'] : array($options['roles']);
         } else {
-            throw new MissingOptionsException("Missing required property 'roles'");
+            throw new MissingOptionsException("Missing required property 'roles'",$options);
         }
 
         if (isset($options['enabled'])) {
@@ -66,7 +66,7 @@ class SecuredCondition
         }
 
         if ($this->enabled === true && !isset($options['field']) && (!isset($options['relation']) || !isset($options['class']))) {
-            throw new MissingOptionsException("Missing required property 'field' or 'relation' and 'class'");
+            throw new MissingOptionsException("Missing required property 'field' or 'relation' and 'class'",$options);
         }
 
         if (isset($options['field'])) {
