@@ -12,7 +12,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use NS\SecurityBundle\Entity\BaseACL;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class ObjectIdToTargetEntity implements DataTransformerInterface
 {
