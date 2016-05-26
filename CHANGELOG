@@ -1,4 +1,10 @@
 
+VERSION 5  REQUIRE SF 2.8 OR HIGHER
+===================================
+
+   Version 5.0 - Require sf 2.8 or higher
+      26/05/2016 09:21  5.0.0  initial release
+
 VERSION 4  MINOR REFACTOR, UPDATED MINIMUM SYMFONY VERSION TO 2.7
 =================================================================
 
