@@ -3,7 +3,7 @@ services:
     class: NS\SecurityBundle\Form\Types\ACLAutoCompleterType
     arguments: [ "@doctrine.orm.entity_manager" ]
     tags:
-      - { name: form.type, alias: acl_object_target_autocompleter }
+      - { name: form.type }
 
   ns_security.acl_converter:
     class: NS\SecurityBundle\Role\ACLConverter

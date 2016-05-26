@@ -10,6 +10,7 @@ namespace NS\SecurityBundle\Form\Types;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use NS\SecurityBundle\Form\Transformer\ObjectIdToTargetEntity;
+use NS\AceBundle\Form\AutocompleterType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -56,18 +57,8 @@ class ACLAutoCompleterType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'acl_object_target_autocompleter';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
-        return 'autocompleter';
+        return AutocompleterType::class;
     }
-
-
 }
