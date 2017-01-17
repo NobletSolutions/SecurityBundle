@@ -12,14 +12,17 @@
     ],
     "require": {
        "php":              ">=5.3.3",
-       "symfony/symfony":  "~2.8|~3.0",
+       "symfony/symfony":  "^2.8|^3.0",
        "doctrine/orm":     ">=2.4"
     },
     "suggest": {
        "ns/ace-bundle": "The ACL autocompleter extends the AceBundle Autocompleter form type"
     },
     "autoload": {
-        "psr-4": { "NS\\SecurityBundle\\": "" }
+        "psr-4": { "NS\\SecurityBundle\\": "src" }
+    },
+    "autoload-dev": {
+        "psr-4": { "NS\\SecurityBundle\\Tests\\": "Tests" }
     },
     "require-dev": {
         "liip/rmt": "1.*",
